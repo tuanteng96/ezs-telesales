@@ -11,7 +11,7 @@ function Navbar({ ExportExcel, IsLoadingEx }) {
       {width > 767 ? (
         <>
           <button
-            class="btn btn-success fw-500 py-6px d-flex align-items-center mr-8px"
+            className="btn btn-success fw-500 py-6px d-flex align-items-center mr-8px"
             type="button"
             onClick={() => window?.top.MemberEdit({ Member: { ID: 0 } })}
           >

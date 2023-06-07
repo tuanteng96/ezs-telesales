@@ -287,7 +287,7 @@ function CareHistory(props) {
                     alt="Không có dữ liệu"
                   />
                   <div className="text-center font-size-base fw-300">
-                    Không có lịch nhắc.
+                    Không có lịch sử.
                   </div>
                 </div>
               </div>

@@ -18,6 +18,7 @@ import 'moment/locale/vi'
 import { setFiltersTeles } from '../../TelesalesSlice'
 import SelectProgress from 'src/components/Selects/SelectProgress'
 import PickerHistory from './components/PickerHistory'
+import PickerReminder from './components/PickerReminder'
 
 moment.locale('vi')
 
@@ -101,7 +102,7 @@ const EditableCell = ({ rowData, container, showEditing, hideEditing }) => {
               {...props}
               style={{
                 position: 'absolute',
-                width: 170,
+                width: 190,
                 ...props.style
               }}
             >
@@ -477,15 +478,6 @@ function TelesalesList(props) {
     () => {
       let newColumns = [
         {
-          key: 'index',
-          title: 'STT',
-          dataKey: 'index',
-          cellRenderer: ({ rowIndex }) => rowIndex + 1,
-          width: 60,
-          sortable: false,
-          align: 'center'
-        },
-        {
           key: 'CreateDate',
           title: 'Ngày tạo & Cơ sở',
           dataKey: 'CreateDate',
@@ -504,34 +496,21 @@ function TelesalesList(props) {
           key: 'FullName',
           title: 'Khách hàng',
           dataKey: 'FullName',
-          cellRenderer: ({ rowData }) => (
-            <div
-              className="cursor-pointer"
-              onClick={() => window.top.MemberEdit({ Member: rowData })}
-            >
-              <div className="fw-600">{rowData?.FullName}</div>
-              <div className="font-number">
-                {rowData.HandCardID} : {rowData?.MobilePhone}
+          cellRenderer: ({ rowData, container }) => (
+            <div>
+              <div
+                className="cursor-pointer"
+                onClick={() => window?.top?.MemberEdit({ Member: rowData })}
+              >
+                <div className="fw-600">{rowData?.FullName}</div>
+                <div className="font-number">
+                  {rowData.HandCardID} : {rowData?.MobilePhone}
+                </div>
               </div>
             </div>
           ),
           width: 200,
           sortable: false
-        },
-        {
-          key: 'Staffs',
-          title: 'Nhân viên phụ trách',
-          dataKey: 'Staffs',
-          width: 200,
-          sortable: false,
-          cellRenderer: ({ rowData, container }) => (
-            <EditableCell
-              rowData={rowData}
-              container={container}
-              hideEditing={() => setIsEditing(false)}
-              showEditing={() => setIsEditing(true)}
-            />
-          )
         },
         {
           key: 'TeleTags',
@@ -549,34 +528,6 @@ function TelesalesList(props) {
           )
         },
         {
-          key: 'TopTele',
-          title: 'Liên hệ gần nhất',
-          cellRenderer: ({ rowData }) => (
-            <>
-              {rowData.TopTele && rowData.TopTele.length > 0 ? (
-                <div className="d-flex align-items-center w-100">
-                  <Text className="flex-1 pr-10px" tooltipMaxWidth={280}>
-                    {rowData.TopTele[0].Content}
-                  </Text>
-                  <PickerHistory data={rowData} onRefresh={onRefresh}>
-                    {({ open }) => (
-                      <i
-                        className="fa-solid fa-circle-info text-warning font-size-lg cursor-pointer"
-                        onClick={open}
-                      ></i>
-                    )}
-                  </PickerHistory>
-                </div>
-              ) : (
-                <>Chưa có liên hệ</>
-              )}
-            </>
-          ),
-          dataKey: 'TopTele',
-          width: 250,
-          sortable: false
-        },
-        {
           key: 'TeleNote',
           title: 'Ghi chú',
           dataKey: 'TeleNote',
@@ -592,8 +543,69 @@ function TelesalesList(props) {
           )
         },
         {
+          key: 'TopTele',
+          title: 'Lịch sử chăm sóc',
+          cellRenderer: ({ rowData }) => (
+            <PickerHistory data={rowData} onRefresh={onRefresh}>
+              {({ open }) => (
+                <div onClick={open}>
+                  {rowData.TopTele && rowData.TopTele.length > 0 ? (
+                    <div className="d-flex flex-column">
+                      <div>
+                        {moment(rowData.TopTele[0].CreateDate).format(
+                          'HH:mm DD-MM-YYYY'
+                        )}
+                      </div>
+                      <Text
+                        className="flex-1 pr-10px"
+                        style={{ width: '260px' }}
+                        tooltipMaxWidth={280}
+                      >
+                        {rowData.TopTele[0].Content}
+                      </Text>
+                    </div>
+                  ) : (
+                    <>Chưa có liên hệ</>
+                  )}
+                </div>
+              )}
+            </PickerHistory>
+          ),
+          dataKey: 'TopTele',
+          width: 280,
+          sortable: false
+        },
+        {
+          key: 'reminder',
+          title: 'Lịch nhắc',
+          dataKey: 'reminder',
+          width: 250,
+          sortable: false,
+          cellRenderer: ({ rowData, container }) => (
+            <PickerReminder data={rowData} onRefresh={onRefresh}>
+              {({ open }) => <div onClick={open}>Mở lịch nhắc</div>}
+            </PickerReminder>
+          )
+        },
+        {
+          key: 'Staffs',
+          title: 'Nhân viên phụ trách',
+          dataKey: 'Staffs',
+          width: 220,
+          sortable: false,
+          cellRenderer: ({ rowData, container }) => (
+            <EditableCell
+              rowData={rowData}
+              container={container}
+              hideEditing={() => setIsEditing(false)}
+              showEditing={() => setIsEditing(true)}
+            />
+          )
+        },
+
+        {
           key: 'action',
-          title: 'Thao tác',
+          title: '',
           dataKey: 'action',
           cellRenderer: ({ rowData }) => (
             <div className="d-flex">
@@ -702,7 +714,7 @@ function TelesalesList(props) {
             pageCount={PageCount}
             onEndReachedThreshold={300}
             onEndReached={handleEndReached}
-            rowHeight={60}
+            rowHeight={80}
             onScroll={() => IsEditing && document.body.click()}
             //onPagesChange={onPagesChange}
             //rowRenderer={rowRenderer}
