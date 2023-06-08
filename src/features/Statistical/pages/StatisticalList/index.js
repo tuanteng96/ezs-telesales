@@ -174,27 +174,27 @@ function StatisticalList(props) {
           dataKey: 'TeleName',
           width: 250,
           sortable: false
-        },
-        {
-          key: 'action',
-          title: 'Thao tác',
-          dataKey: 'action',
-          cellRenderer: ({ rowData }) => (
-            <div className="d-flex">
-              <Link
-                className="w-38px h-38px rounded-circle d-flex align-items-center justify-content-center text-none btn btn-primary shadow mx-4px"
-                to={`/danh-sach/${rowData.MemberID}/dich-vu`}
-                state={{ from: pathname, filters: filters }}
-              >
-                <i className="fa-regular fa-arrow-right pt-2px"></i>
-              </Link>
-            </div>
-          ),
-          align: 'center',
-          width: 130,
-          sortable: false,
-          frozen: width > 991 ? 'right' : false
         }
+        // {
+        //   key: 'action',
+        //   title: 'Thao tác',
+        //   dataKey: 'action',
+        //   cellRenderer: ({ rowData }) => (
+        //     <div className="d-flex">
+        //       <Link
+        //         className="w-38px h-38px rounded-circle d-flex align-items-center justify-content-center text-none btn btn-primary shadow mx-4px"
+        //         to={`/danh-sach/${rowData.MemberID}/dich-vu`}
+        //         state={{ from: pathname, filters: filters }}
+        //       >
+        //         <i className="fa-regular fa-arrow-right pt-2px"></i>
+        //       </Link>
+        //     </div>
+        //   ),
+        //   align: 'center',
+        //   width: 130,
+        //   sortable: false,
+        //   frozen: width > 991 ? 'right' : false
+        // }
       ]
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -253,7 +253,7 @@ function StatisticalList(props) {
         onSubmit={onFilter}
         onRefresh={onRefresh}
       />
-      <div className="telesales-list__content flex-fill px-15px px-lg-30px pb-15px pb-lg-30px d-flex flex-column">
+      <div className="telesales-list__content flex-fill px-15px px-lg-20px pb-15px pb-lg-20px d-flex flex-column">
         <div className="border-bottom py-10px fw-600 font-size-lg position-relative d-flex justify-content-between align-items-center">
           <div className="flex-1">
             <span className="text-uppercase">

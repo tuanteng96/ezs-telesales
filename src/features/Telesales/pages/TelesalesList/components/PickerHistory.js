@@ -14,6 +14,7 @@ import moment from 'moment'
 import 'moment/locale/vi'
 import { Formik, Form } from 'formik'
 import SelectTeleHis from 'src/components/Selects/SelectTeleHis'
+import FileUpload from './FileUpload'
 
 moment.locale('vi')
 
@@ -24,7 +25,8 @@ const perfectScrollbarOptions = {
 
 const initialValues = {
   Content: '',
-  Result: ''
+  Result: '',
+  Audio: ''
 }
 
 const AddWishListSchema = Yup.object().shape({
@@ -76,7 +78,8 @@ function PickerHistory({ children, data, onRefresh }) {
           MemberID: MemberID,
           Content: values.Content,
           Type: 'PROCESS',
-          Result: values.Result ? values.Result.value : ''
+          Result: values.Result ? values.Result.value : '',
+          Audio: values.Audio
         }
       ],
       delete: []
@@ -152,9 +155,11 @@ function PickerHistory({ children, data, onRefresh }) {
           <Modal.Header closeButton>
             <Modal.Title>
               <div>
-                <div className="fw-600 font-size-lg">{data?.FullName}</div>
-                <div className="font-number font-size-sm">
-                  {data.HandCardID} : {data?.MobilePhone}
+                <div className="fw-600 font-size-lg text-uppercase">
+                  Lịch sử chăm sóc
+                </div>
+                <div className="font-number font-size-base">
+                  {data?.FullName} - {data.HandCardID} - {data?.MobilePhone}
                 </div>
               </div>
             </Modal.Title>
@@ -175,6 +180,7 @@ function PickerHistory({ children, data, onRefresh }) {
                   handleBlur,
                   handleChange
                 } = formikProps
+                
                 return (
                   <Form className="p-15px border-bottom">
                     <div className="form-group mb-15px">
@@ -200,7 +206,7 @@ function PickerHistory({ children, data, onRefresh }) {
                             ? 'is-invalid solid-invalid'
                             : ''
                         }`}
-                        rows="3"
+                        rows="2"
                         value={values.Content}
                         onChange={handleChange}
                         onBlur={handleBlur}
@@ -223,9 +229,8 @@ function PickerHistory({ children, data, onRefresh }) {
               }}
             </Formik>
           </div>
-          <PerfectScrollbar
-            options={perfectScrollbarOptions}
-            className="scroll flex-grow-1 p-15px"
+          <div
+            className="overflow-auto flex-grow-1 p-15px"
             style={{ position: 'relative' }}
           >
             {loading &&
@@ -306,7 +311,7 @@ function PickerHistory({ children, data, onRefresh }) {
                 )}
               </>
             )}
-          </PerfectScrollbar>
+          </div>
         </Modal>,
         document.body
       )}

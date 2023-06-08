@@ -44,7 +44,7 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
             return (
               <Form className="d-flex flex-column h-100">
                 <div className="border-bottom p-15px text-uppercase fw-600 font-size-lg position-relative">
-                  Bộ lọc khách hàng
+                  Tìm kiếm
                 </div>
                 <div className="flex-grow-1 p-15px overflow-auto">
                   <div className="mb-15px form-group">

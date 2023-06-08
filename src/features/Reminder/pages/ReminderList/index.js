@@ -15,6 +15,7 @@ import * as Yup from 'yup'
 import moment from 'moment'
 import 'moment/locale/vi'
 import { Link, useLocation } from 'react-router-dom'
+import { useWindowSize } from 'src/hooks/useWindowSize'
 
 moment.locale('vi')
 
@@ -204,7 +205,7 @@ function ReminderList(props) {
   )
 
   const { onOpenSidebar } = useContext(ReminderContext)
-
+  const { width } = useWindowSize()
   useEffect(() => {
     getListReminder()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -268,15 +269,10 @@ function ReminderList(props) {
         dataKey: 'member.FullName',
         width: 250,
         cellRenderer: ({ rowData }) => (
-          <Link
-            className="text-black"
-            style={{ textDecoration: 'none' }}
-            to={`/danh-sach/${rowData?.member?.ID}/dich-vu`}
-            state={{ from: pathname, filters: filters }}
-          >
+          <div>
             <div className="fw-600">{rowData?.member?.FullName}</div>
             <div className="font-number">{rowData?.member?.MobilePhone}</div>
-          </Link>
+          </div>
         ),
         sortable: false,
         rowSpan: ({ rowData }) => rowData.rowSpan || 1
@@ -310,39 +306,36 @@ function ReminderList(props) {
         key: 'IsNoti',
         title: 'Trạng thái',
         dataKey: 'IsNoti',
-        cellRenderer: ({ rowData }) =>
-          rowData.IsNoti ? (
-            <span className="badge bg-primary">Đã nhắc</span>
-          ) : (
-            <span className="badge bg-danger">Chưa nhắc</span>
-          ),
-        width: 200,
+        cellRenderer: ({ rowData }) => (
+          <div className="cursor-pointer">
+            {rowData.IsNoti ? (
+              <span className="badge bg-primary">Đã nhắc</span>
+            ) : (
+              <span className="badge bg-danger">Chưa nhắc</span>
+            )}
+          </div>
+        ),
+        width: 130,
         sortable: false
+        //frozen: width > 991 ? 'right' : false
       },
       {
         key: 'Action',
         title: 'Thực hiện',
         dataKey: 'Action',
         cellRenderer: ({ rowData }) => (
-          <OverlayComponent
-            onSubmit={onSubmit}
-            btnLoading={btnLoading}
-            Button={() => (
-              <button
-                type="button"
-                className="fw-500 cursor-pointer btn btn-sm btn-success py-5px"
-                disabled={!teleAdv || rowData.IsNoti}
-              >
-                Thực hiện
-              </button>
-            )}
-            item={{
-              member: rowData.member,
-              notifications: rowData.DetailNoti
-            }}
-          />
+          <div>
+            <button
+              type="button"
+              className={`fw-500 cursor-pointer btn btn-sm btn-${rowData?.IsNoti ? "danger":"success"} py-5px`}
+              disabled={!teleAdv}
+              onClick={() => onSubmit(rowData)}
+            >
+              {rowData?.IsNoti ? 'Chưa nhắc' : 'Thực hiện'}
+            </button>
+          </div>
         ),
-        width: 150,
+        width: 110,
         sortable: false
       }
     ],
@@ -351,25 +344,20 @@ function ReminderList(props) {
 
   const onSubmit = async values => {
     setBtnLoading(true)
+
     const newNoti = {
       noti: {
-        ...values.noti
+        MemberID: values?.DetailNoti?.MemberID,
+        Date: moment(values?.DetailNoti?.Date).format('MM/DD/YYYY'),
+        CreateDate: moment(values?.DetailNoti?.CreateDate).format('MM/DD/YYYY'),
+        Desc: values?.DetailNoti?.Desc,
+        IsNoti: !values?.DetailNoti?.IsNoti,
+        ID: values?.DetailNoti?.ID
       }
     }
-    const newHis = {
-      items: [
-        {
-          MemberID: values.noti.MemberID,
-          Content: values.Content,
-          Type: 'PROCESS',
-          Result: values.Result ? values.Result.value : ''
-        }
-      ],
-      delete: []
-    }
+
     try {
       await telesalesApi.addNotiMember(newNoti)
-      await telesalesApi.addCareHistory(newHis)
       if (filters.Pi > 1) {
         setFilters(prevState => ({ ...prevState, Pi: 1 }))
       } else {
@@ -451,7 +439,7 @@ function ReminderList(props) {
         onSubmit={onFilter}
         onRefresh={onRefresh}
       />
-      <div className="telesales-list__content flex-fill px-15px px-lg-30px pb-15px pb-lg-30px d-flex flex-column">
+      <div className="telesales-list__content flex-fill px-15px px-lg-20px pb-15px pb-lg-20px d-flex flex-column">
         <div className="border-bottom py-10px fw-600 font-size-lg position-relative d-flex justify-content-between align-items-center">
           <div className="flex-1">
             <span className="text-uppercase">Lịch nhắc -</span>

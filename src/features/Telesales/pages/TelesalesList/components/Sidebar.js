@@ -169,7 +169,7 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
             return (
               <Form className="d-flex flex-column h-100">
                 <div className="border-bottom p-15px text-uppercase fw-600 font-size-lg position-relative">
-                  Bộ lọc khách hàng
+                  Tìm kiếm
                   {teleAdv && (
                     <div className="cursor-pointer position-absolute top-8px right-10px">
                       <Dropdown>
@@ -391,7 +391,7 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                         />
                         <span className="checkbox-icon"></span>
                         <span className="fw-500 font-label">
-                          Chưa chọn nhân viên phụ trách
+                          Chưa chọn nhân viên
                         </span>
                       </label>
                     </>

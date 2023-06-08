@@ -22,3 +22,8 @@
     width: calc(100% - var(--width-scroll)) !important;
   }
 }
+
+body .BaseTable__header-cell:first-child,
+body .BaseTable__table-main .BaseTable__row-cell:first-child {
+  padding-left: 15px !important;
+}

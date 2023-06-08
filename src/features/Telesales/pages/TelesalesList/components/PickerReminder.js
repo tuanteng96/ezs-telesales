@@ -288,9 +288,11 @@ function PickerReminder({ children, data, onRefresh }) {
           <Modal.Header closeButton>
             <Modal.Title>
               <div>
-                <div className="fw-600 font-size-lg text-uppercase">Lịch nhắc</div>
+                <div className="fw-600 font-size-lg text-uppercase">
+                  Lịch nhắc
+                </div>
                 <div className="font-number font-size-base">
-                {data?.FullName} - {data.HandCardID} - {data?.MobilePhone}
+                  {data?.FullName} - {data.HandCardID} - {data?.MobilePhone}
                 </div>
               </div>
             </Modal.Title>

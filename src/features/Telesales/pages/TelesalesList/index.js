@@ -350,6 +350,7 @@ function TelesalesList(props) {
   const dispatch = useDispatch()
 
   const [filters, setFilters] = useState({
+    withsNoti: true,
     filter: {
       tele_process: filtersRedux.tele_process || '', //Đang tiếp cận,Đặt lịch thành công
       tele_user_id: filtersRedux.tele_user_id
@@ -555,6 +556,15 @@ function TelesalesList(props) {
                         {moment(rowData.TopTele[0].CreateDate).format(
                           'HH:mm DD-MM-YYYY'
                         )}
+                        {rowData.TopTele[0].Audio && (
+                          <a
+                            class="ml-10px"
+                            href={rowData.TopTele[0].Audio}
+                            target="_blank"
+                          >
+                            <i class="fas fa-play"></i>
+                          </a>
+                        )}
                       </div>
                       <Text
                         className="flex-1 pr-10px"
@@ -583,7 +593,37 @@ function TelesalesList(props) {
           sortable: false,
           cellRenderer: ({ rowData, container }) => (
             <PickerReminder data={rowData} onRefresh={onRefresh}>
-              {({ open }) => <div onClick={open}>Mở lịch nhắc</div>}
+              {({ open }) => (
+                <div onClick={open}>
+                  <div>
+                    {rowData.NotiList && rowData.NotiList.length > 0 ? (
+                      <>
+                        <div className="mt-8px fw-500">
+                          Ngày nhắc
+                          <span className="pl-5px">
+                            {moment(rowData.NotiList[0].Date).format(
+                              'DD-MM-YYYY'
+                            )}
+                          </span>
+                          {rowData.NotiList[0].IsNoti && (
+                            <span className="pl-5px font-size-xs text-success">
+                              - Đã nhắc
+                            </span>
+                          )}
+                        </div>
+                        <Text style={{ width: '230px' }} tooltipMaxWidth={250}>
+                          Nội dung :
+                          <span className="fw-500 pl-3px">
+                            {rowData.NotiList[0].Desc}
+                          </span>
+                        </Text>
+                      </>
+                    ) : (
+                      'Thêm lịch nhắc'
+                    )}
+                  </div>
+                </div>
+              )}
             </PickerReminder>
           )
         },
@@ -677,10 +717,10 @@ function TelesalesList(props) {
         onSubmit={onFilter}
         onRefresh={onRefresh}
       />
-      <div className="telesales-list__content flex-fill px-15px px-lg-30px pb-15px pb-lg-30px d-flex flex-column">
+      <div className="telesales-list__content flex-fill px-15px px-lg-20px pb-15px pb-lg-20px d-flex flex-column">
         <div className="border-bottom py-10px fw-600 font-size-lg position-relative d-flex justify-content-between align-items-center">
           <div className="flex-1">
-            <span className="text-uppercase ">Danh sách khách hàng -</span>
+            <span className="text-uppercase ">Danh sách -</span>
             <span className="text-danger pl-3px">{PageTotal}</span>
             <span className="pl-5px font-label text-muted font-size-sm text-none">
               khách hàng
