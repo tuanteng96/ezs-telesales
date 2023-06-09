@@ -464,6 +464,8 @@ function TelesalesList(props) {
       .catch(error => console.log(error))
   }
 
+  window.getListTelesales = getListTelesales
+
   const onRefresh = callback => {
     if (filters.pi > 1) {
       setFilters(prevState => ({ ...prevState, pi: 1 }))
@@ -501,7 +503,12 @@ function TelesalesList(props) {
             <div>
               <div
                 className="cursor-pointer"
-                onClick={() => window?.top?.MemberEdit({ Member: rowData })}
+                onClick={() =>
+                  window?.top?.MemberEdit({
+                    Member: rowData,
+                    done: () => getListTelesales && getListTelesales()
+                  })
+                }
               >
                 <div className="fw-600">{rowData?.FullName}</div>
                 <div className="font-number">

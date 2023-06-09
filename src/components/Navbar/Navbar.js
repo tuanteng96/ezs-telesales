@@ -13,7 +13,12 @@ function Navbar({ ExportExcel, IsLoadingEx }) {
           <button
             className="btn btn-success fw-500 py-6px d-flex align-items-center mr-8px"
             type="button"
-            onClick={() => window?.top.MemberEdit({ Member: { ID: 0 } })}
+            onClick={() =>
+              window?.top?.MemberEdit({
+                Member: { ID: 0 },
+                done: () => window.getListTelesales && window.getListTelesales()
+              })
+            }
           >
             Thêm mới
           </button>
