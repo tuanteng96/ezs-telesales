@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useLocation } from 'react-router-dom'
 import telesalesApi from 'src/api/telesales.api'
 import ReactBaseTableInfinite from 'src/components/Tables/ReactBaseTableInfinite'
 import Sidebar from './components/Sidebar'
@@ -137,7 +136,6 @@ const EditableCellProcess = ({
     teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false
   }))
   const [Editing, setEditing] = useState(false)
-  const [loading, setLoading] = useState(false)
 
   const [value, setValue] = useState(
     rowData?.TeleTags
@@ -166,7 +164,6 @@ const EditableCellProcess = ({
   }
 
   const onSubmit = options => {
-    setLoading(true)
     let newData = {
       items: [
         {
@@ -179,7 +176,6 @@ const EditableCellProcess = ({
       .editTagsMember(newData)
       .then(response => {
         setValue(options)
-        setLoading(false)
       })
       .catch(error => console.log(error))
   }
@@ -230,7 +226,6 @@ const EditableCellNote = ({ rowData, container, showEditing, hideEditing }) => {
     teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false
   }))
   const [Editing, setEditing] = useState(false)
-  const [loading, setLoading] = useState(false)
 
   const [value, setValue] = useState(rowData?.Desc)
   const target = useRef(null)
@@ -270,7 +265,6 @@ const EditableCellNote = ({ rowData, container, showEditing, hideEditing }) => {
         .editNoteMember(newData)
         .then(response => {
           setValue(value)
-          setLoading(false)
         })
         .catch(error => console.log(error))
     }, 300)
@@ -289,7 +283,7 @@ const EditableCellNote = ({ rowData, container, showEditing, hideEditing }) => {
             width: 290
           }}
         >
-          <Text tooltipMaxWidth={290}>{value || ''}</Text>
+          <Text tooltipMaxWidth={290}>{value || 'Nhập ghi chú'}</Text>
         </div>
       )}
       {Editing && target && (
@@ -340,6 +334,7 @@ function TelesalesList(props) {
   )
   const [ListTelesales, setListTelesales] = useState([])
   const [loading, setLoading] = useState(false)
+  const [loadingCall, setLoadingCall] = useState('')
   const [PageCount, setPageCount] = useState(0)
   const [PageTotal, setPageTotal] = useState(0)
   const [IsEditing, setIsEditing] = useState(false)
@@ -382,7 +377,6 @@ function TelesalesList(props) {
   })
 
   const { width } = useWindowSize()
-  const { pathname } = useLocation()
 
   useEffect(() => {
     getListTelesales()
@@ -464,7 +458,7 @@ function TelesalesList(props) {
       .catch(error => console.log(error))
   }
 
-  window.getListTelesales = getListTelesales
+  window.top.getListTelesales = getListTelesales
 
   const onRefresh = callback => {
     if (filters.pi > 1) {
@@ -477,6 +471,21 @@ function TelesalesList(props) {
     }
   }
 
+  const callNow = phone => {
+    if (!phone) return
+    setLoadingCall(phone)
+    telesalesApi
+      .callNow({ Phone: phone })
+      .then(({ data }) => {
+        if (data?.error) {
+          window?.top?.toastr?.error(data?.error, '', { timeOut: 1000 })
+        }
+        setLoadingCall('')
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }
   const columns = useMemo(
     () => {
       let newColumns = [
@@ -506,7 +515,9 @@ function TelesalesList(props) {
                 onClick={() =>
                   window?.top?.MemberEdit({
                     Member: rowData,
-                    done: () => getListTelesales && getListTelesales()
+                    done: () =>
+                      window?.top?.getListTelesales &&
+                      window?.top?.getListTelesales()
                   })
                 }
               >
@@ -568,6 +579,7 @@ function TelesalesList(props) {
                             class="ml-10px"
                             href={rowData.TopTele[0].Audio}
                             target="_blank"
+                            rel="noreferrer"
                           >
                             <i class="fas fa-play"></i>
                           </a>
@@ -656,18 +668,38 @@ function TelesalesList(props) {
           dataKey: 'action',
           cellRenderer: ({ rowData }) => (
             <div className="d-flex">
-              <a
-                href={`tel:${rowData?.MobilePhone}`}
+              <button
+                disabled={loadingCall !== ''}
+                type="button"
+                onClick={() => callNow(rowData?.MobilePhone)}
+                //href={`tel:${rowData?.MobilePhone}`}
                 className="w-38px h-38px rounded-circle btn btn-success shadow mx-4px p-0 position-relative"
               >
-                <img
-                  className="w-23px position-absolute top-7px right-7px"
-                  src={AssetsHelpers.toAbsoluteUrl(
-                    '/_assets/images/icon-call.png'
-                  )}
-                  alt=""
-                />
-              </a>
+                {loadingCall === rowData?.MobilePhone ? (
+                  <div
+                    className="position-absolute d-flex align-items-center justify-content-center"
+                    style={{
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      width: '100%',
+                      height: '100%'
+                    }}
+                  >
+                    <div className="spinner-border text-white" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                ) : (
+                  <img
+                    className="w-23px position-absolute top-7px right-7px"
+                    src={AssetsHelpers.toAbsoluteUrl(
+                      '/_assets/images/icon-call.png'
+                    )}
+                    alt="Call"
+                  />
+                )}
+              </button>
             </div>
           ),
           align: 'center',
@@ -690,7 +722,7 @@ function TelesalesList(props) {
       return newColumns
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [width, ListTelesales]
+    [width, ListTelesales, loadingCall]
   )
 
   const handleEndReached = () => {

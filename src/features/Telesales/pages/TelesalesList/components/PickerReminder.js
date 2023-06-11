@@ -14,18 +14,12 @@ import DatePicker from 'react-datepicker'
 import moment from 'moment'
 import 'moment/locale/vi'
 import { Formik, Form } from 'formik'
-import SelectTeleHis from 'src/components/Selects/SelectTeleHis'
 
 moment.locale('vi')
 
 const perfectScrollbarOptions = {
   wheelSpeed: 2,
   wheelPropagation: false
-}
-
-const initialValues = {
-  Content: '',
-  Result: ''
 }
 
 const AddNotiSchema = Yup.object().shape({

@@ -1,11 +1,13 @@
-import clsx from 'clsx'
 import React from 'react'
 import { Dropdown } from 'react-bootstrap'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useWindowSize } from 'src/hooks/useWindowSize'
 
 function Navbar({ ExportExcel, IsLoadingEx }) {
+  const { pathname } = useLocation()
+  const navigation = useNavigate()
   const { width } = useWindowSize()
+
   return (
     <>
       {width > 767 ? (
@@ -16,7 +18,13 @@ function Navbar({ ExportExcel, IsLoadingEx }) {
             onClick={() =>
               window?.top?.MemberEdit({
                 Member: { ID: 0 },
-                done: () => window.getListTelesales && window.getListTelesales()
+                done: () => {
+                  window?.top?.getListTelesales &&
+                    window?.top?.getListTelesales()
+                  if (pathname !== '/danh-sach') {
+                    navigation('/')
+                  }
+                }
               })
             }
           >

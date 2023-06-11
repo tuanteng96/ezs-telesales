@@ -5,7 +5,6 @@ import { createPortal } from 'react-dom'
 import Skeleton from 'react-loading-skeleton'
 import telesalesApi from 'src/api/telesales.api'
 import { AssetsHelpers } from 'src/helpers/AssetsHelpers'
-import PerfectScrollbar from 'react-perfect-scrollbar'
 import Swal from 'sweetalert2'
 import { useSelector } from 'react-redux'
 import * as Yup from 'yup'
@@ -14,14 +13,8 @@ import moment from 'moment'
 import 'moment/locale/vi'
 import { Formik, Form } from 'formik'
 import SelectTeleHis from 'src/components/Selects/SelectTeleHis'
-import FileUpload from './FileUpload'
 
 moment.locale('vi')
-
-const perfectScrollbarOptions = {
-  wheelSpeed: 2,
-  wheelPropagation: false
-}
 
 const initialValues = {
   Content: '',
@@ -180,7 +173,7 @@ function PickerHistory({ children, data, onRefresh }) {
                   handleBlur,
                   handleChange
                 } = formikProps
-                
+
                 return (
                   <Form className="p-15px border-bottom">
                     <div className="form-group mb-15px">

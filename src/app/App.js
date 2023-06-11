@@ -16,6 +16,7 @@ import Statistical from 'src/features/Statistical'
 import StatisticalList from 'src/features/Statistical/pages/StatisticalList'
 import Reminder from 'src/features/Reminder'
 import ReminderList from 'src/features/Reminder/pages/ReminderList'
+import ReplyCallNow from 'src/components/ReplyCallNow/ReplyCallNow'
 
 function App({ store, persistor }) {
   return (
@@ -85,6 +86,7 @@ function App({ store, persistor }) {
               element={<Navigate to="/" replace />}
             />
           </Routes>
+          <ReplyCallNow />
         </ScrollToTop>
       </AuthInit>
     </Provider>

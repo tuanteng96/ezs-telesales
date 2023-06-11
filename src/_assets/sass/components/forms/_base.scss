@@ -19,6 +19,7 @@
     font-weight: $form-text-font-weight;
   }
   .solid-invalid {
+    border-radius: 2px;
     background-color: $white !important;
     border: 1px solid $danger !important;
     ~ .is-invalid-hide {
