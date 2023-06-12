@@ -5,7 +5,12 @@ import { LayoutSplashScreen } from 'src/layout/_core/SplashScreen'
 import { setProfile } from './AuthSlice'
 
 function checkInfo(fn) {
-  if (window.top.Info && window.top.token && window.top.GlobalConfig) {
+  if (
+    window.top.Info &&
+    window.top.token &&
+    window.top.GlobalConfig &&
+    window.top.Configs
+  ) {
     fn()
   } else {
     setTimeout(() => {
@@ -127,7 +132,12 @@ function AuthInit(props) {
         setShowSplashScreen(false)
       })
     }
-    if (!window.top.Info || !window.top.token || !window.top.GlobalConfig) {
+    if (
+      !window.top.Info ||
+      !window.top.token ||
+      !window.top.GlobalConfig ||
+      !window.top.Configs
+    ) {
       requestUser()
     } else {
       dispatch(

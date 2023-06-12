@@ -20,24 +20,19 @@ function SelectProgress({ onChange, value, isLoading, className, ...props }) {
   }, [])
 
   const getAllProgress = async () => {
-    setLoading(true)
-    const { data } = await configApi.getConfigName('tagkh')
-    if (data && data.data && data?.data.length > 0) {
-      const result = JSON.parse(data.data[0].Value)
-      const newResult = result.map(item => ({
-        value: item.Title,
-        label: item.Title,
-        options:
-          item.Children &&
-          item.Children.map(o => ({
-            value: o.Title,
-            label: o.Title
-          }))
-      }))
-      setOptions(newResult)
-      setTagsList && setTagsList(newResult)
-      setLoading(false)
-    }
+    const result = window.top.Configs[0].Value
+    const newResult = JSON.parse(result).map(item => ({
+      value: item.Title,
+      label: item.Title,
+      options:
+        item.Children &&
+        item.Children.map(o => ({
+          value: o.Title,
+          label: o.Title
+        }))
+    }))
+    setOptions(newResult)
+    setTagsList && setTagsList(newResult)
   }
 
   return (

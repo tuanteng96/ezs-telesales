@@ -132,9 +132,6 @@ const EditableCellProcess = ({
   showEditing,
   hideEditing
 }) => {
-  const { teleAdv } = useSelector(({ auth }) => ({
-    teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false
-  }))
   const [Editing, setEditing] = useState(false)
 
   const [value, setValue] = useState(
@@ -153,7 +150,6 @@ const EditableCellProcess = ({
   }, [rowData?.TeleTags])
 
   const handleClick = () => {
-    if (!teleAdv) return
     setEditing(true)
     showEditing()
   }
@@ -209,7 +205,7 @@ const EditableCellProcess = ({
                 //isDisabled={loading}
                 //isMulti
                 className="w-100 flex-1"
-                placeholder="Chọn tags khách hàng"
+                placeholder="Chọn trạng thái khách"
                 onChange={onSubmit}
                 value={value}
               />
@@ -222,9 +218,6 @@ const EditableCellProcess = ({
 }
 
 const EditableCellNote = ({ rowData, container, showEditing, hideEditing }) => {
-  const { teleAdv } = useSelector(({ auth }) => ({
-    teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false
-  }))
   const [Editing, setEditing] = useState(false)
 
   const [value, setValue] = useState(rowData?.Desc)
@@ -236,7 +229,6 @@ const EditableCellNote = ({ rowData, container, showEditing, hideEditing }) => {
   }, [rowData?.Desc])
 
   const handleClick = () => {
-    if (!teleAdv) return
     setEditing(true)
     showEditing()
   }

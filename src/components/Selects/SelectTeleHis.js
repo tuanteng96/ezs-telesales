@@ -9,7 +9,6 @@ SelectTeleHis.propTypes = {
 }
 
 function SelectTeleHis({ onChange, value, isLoading, className, ...props }) {
-  const [loading, setLoading] = useState(false)
   const [options, setOptions] = useState([])
 
   useEffect(() => {
@@ -18,26 +17,20 @@ function SelectTeleHis({ onChange, value, isLoading, className, ...props }) {
   }, [])
 
   const getAllTeleHis = async () => {
-    setLoading(true)
-    const { data } = await configApi.getConfigName('kqtele')
-    if (data && data.data && data?.data.length > 0) {
-      const result = data.data[0].ValueText
-      const newResult = result
-        ? result.split(',').map(item => ({
-            value: item,
-            label: item
-          }))
-        : []
-      setOptions(newResult)
-      setLoading(false)
-    }
+    const result = window.top.Configs[1].ValueText
+    const newResult = result
+      ? result.split(',').map(item => ({
+          value: item,
+          label: item
+        }))
+      : []
+    setOptions(newResult)
   }
 
   return (
     <Select
       {...props}
       isClearable
-      isLoading={isLoading || loading}
       classNamePrefix="select"
       className={clsx('select-control', className)}
       options={options}

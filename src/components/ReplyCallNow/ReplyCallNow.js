@@ -101,7 +101,7 @@ function ReplyCallNow() {
     }
     try {
       await telesalesApi.addCareHistory(newDataHist)
-      await telesalesApi.setUserIDTelesales(newDataTags)
+      await telesalesApi.editTagsMember(newDataTags)
       if (newDataReminder.noti.Date) {
         await telesalesApi.addNotiMember(newDataReminder)
       }
