@@ -576,12 +576,12 @@ function TelesalesList(props) {
                         )}
                         {rowData.TopTele[0].Audio && (
                           <a
-                            class="ml-10px"
-                            href={rowData.TopTele[0].Audio}
+                            className="ml-10px"
+                            href={'/upload/image/' + rowData.TopTele[0].Audio}
                             target="_blank"
                             rel="noreferrer"
                           >
-                            <i class="fas fa-play"></i>
+                            <i className="fas fa-play"></i>
                           </a>
                         )}
                       </div>

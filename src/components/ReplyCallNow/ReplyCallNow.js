@@ -9,6 +9,7 @@ import * as Yup from 'yup'
 import moment from 'moment'
 import 'moment/locale/vi'
 import telesalesApi from 'src/api/telesales.api'
+import Portal from 'react-overlays/cjs/Portal'
 
 moment.locale('vi')
 
@@ -30,6 +31,12 @@ const initialValue = {
 const AddSchema = Yup.object().shape({
   Result: Yup.object().required('Vui lòng chọn kết quả')
 })
+
+const CalendarContainer = ({ children }) => {
+  const el = document.getElementById('calendar-portal')
+
+  return <Portal container={el}>{children}</Portal>
+}
 
 function ReplyCallNow() {
   const [initialValues, setInitialValues] = useState(initialValue)
@@ -99,7 +106,7 @@ function ReplyCallNow() {
         await telesalesApi.addNotiMember(newDataReminder)
       }
       window?.top?.getListTelesales && window?.top?.getListTelesales()
-      window.top.toastr.success("Cập nhập thành công")
+      window.top.toastr.success('Cập nhập thành công')
       setLoading(false)
       setVisible(false)
     } catch (error) {
@@ -145,6 +152,14 @@ function ReplyCallNow() {
                     }}
                     value={values.Result}
                     isClearable={true}
+                    menuPortalTarget={document.body}
+                    menuPosition="fixed"
+                    styles={{
+                      menuPortal: base => ({
+                        ...base,
+                        zIndex: 9999
+                      })
+                    }}
                   />
                 </div>
                 <div className="form-group mb-15px">
@@ -156,6 +171,7 @@ function ReplyCallNow() {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     value={values.Audio}
+                    autoComplete="off"
                   />
                 </div>
                 <div className="form-group mb-15px">
@@ -169,6 +185,14 @@ function ReplyCallNow() {
                       setFieldValue('TeleTags', otp, false)
                     }}
                     value={values.TeleTags}
+                    menuPortalTarget={document.body}
+                    menuPosition="fixed"
+                    styles={{
+                      menuPortal: base => ({
+                        ...base,
+                        zIndex: 9999
+                      })
+                    }}
                   />
                 </div>
                 <div className="form-group mb-15px">
@@ -221,6 +245,7 @@ function ReplyCallNow() {
                         dateFormat="dd/MM/yyyy"
                         onBlur={handleBlur}
                         autoComplete="off"
+                        popperContainer={CalendarContainer}
                         //dateFormatCalendar="MMMM"
                       />
                     </div>
@@ -244,6 +269,13 @@ function ReplyCallNow() {
                 <div></div>
               </Modal.Body>
               <Modal.Footer>
+                <button
+                  onClick={() => setVisible(false)}
+                  type="button"
+                  className="btn btn-secondary flex"
+                >
+                  Đóng
+                </button>
                 <button
                   disabled={loading}
                   type="submit"

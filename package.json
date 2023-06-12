@@ -29,6 +29,7 @@
         "react-infinite-scroll-component": "^6.1.0",
         "react-loading-skeleton": "^3.1.0",
         "react-number-format": "^5.0.0-beta.5",
+        "react-overlays": "^5.2.1",
         "react-perfect-scrollbar": "1.5.8",
         "react-redux": "^8.0.1",
         "react-router-dom": "6",
