@@ -240,7 +240,7 @@ const EditableCellNote = ({ rowData, container, showEditing, hideEditing }) => {
 
   const onSubmit = e => {
     const value = e.target.value
-    setValue(value)
+
     const newData = {
       items: [
         {
@@ -256,7 +256,7 @@ const EditableCellNote = ({ rowData, container, showEditing, hideEditing }) => {
       telesalesApi
         .editNoteMember(newData)
         .then(response => {
-          setValue(value)
+          //setValue(value)
         })
         .catch(error => console.log(error))
     }, 300)
@@ -301,7 +301,8 @@ const EditableCellNote = ({ rowData, container, showEditing, hideEditing }) => {
                   className="w-100 form-control p-12px fw-500"
                   rows="5"
                   placeholder="Nhập ghi chú"
-                  onChange={onSubmit}
+                  onChange={e => setValue(e.target.value)}
+                  onBlur={onSubmit}
                   value={value}
                 ></textarea>
               </div>
