@@ -20,7 +20,7 @@ function SelectProgress({ onChange, value, isLoading, className, ...props }) {
   }, [])
 
   const getAllProgress = async () => {
-    const result = window.top.Configs[0].Value
+    const result = window.top.Configs[0].Value || '[{"Title":"Tiếp cận","Children":[{"Title":"Khách mới"},{"Title":"Khách đang tiếp cận"},{"Title":"Tư vấn xong "},{"Title":"Demo xong"},{"Title":"Khách hàng tiềm năng "},{"Title":"Không có nhu cầu"},{"Title":"Không liên lạc được"},{"Title":"Khách sử dụng PM khác"}]},{"Title":"Dùng thử","Children":[{"Title":"Dùng thử"},{"Title":"Khách chốt"},{"Title":"Khách thanh toán"},{"Title":"Khách không chốt"},{"Title":"Khách không đủ tiền"},{"Title":"Khách hẹn 1 TG nữa"}]},{"Title":"Triển khai","Children":[{"Title":"Setup PM - APP"},{"Title":"Bàn giao  "},{"Title":"Hỗ trợ "}]}]'
     const newResult = JSON.parse(result).map(item => ({
       value: item.Title,
       label: item.Title,

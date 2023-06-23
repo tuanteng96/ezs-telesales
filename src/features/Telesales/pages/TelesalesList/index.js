@@ -136,7 +136,7 @@ const EditableCellProcess = ({
 
   const [value, setValue] = useState(
     rowData?.TeleTags
-      ? { label: rowData?.TeleTags, value: rowData?.TeleTags }
+      ? rowData?.TeleTags.split(',').map(x => ({ label: x, value: x }))
       : null
   )
   const target = useRef(null)
@@ -144,7 +144,7 @@ const EditableCellProcess = ({
   useEffect(() => {
     setValue(
       rowData?.TeleTags
-        ? { label: rowData?.TeleTags, value: rowData?.TeleTags }
+        ? rowData?.TeleTags.split(',').map(x => ({ label: x, value: x }))
         : null
     )
   }, [rowData?.TeleTags])
@@ -164,7 +164,7 @@ const EditableCellProcess = ({
       items: [
         {
           MemberID: rowData?.ID,
-          TeleTags: options?.value
+          TeleTags: options ? options.map(x => x.value).join(',') : ''
         }
       ]
     }
@@ -182,7 +182,9 @@ const EditableCellProcess = ({
       ref={target}
       onClick={() => handleClick()}
     >
-      {!Editing && <>{value ? value.label : 'Chọn trạng thái'}</>}
+      {!Editing && (
+        <>{value && value.length > 0 ? value.map(x => x.value).join(',') : 'Chọn trạng thái'}</>
+      )}
       {Editing && target && (
         <Overlay
           target={target.current}
@@ -203,7 +205,7 @@ const EditableCellProcess = ({
             >
               <SelectProgress
                 //isDisabled={loading}
-                //isMulti
+                isMulti
                 className="w-100 flex-1"
                 placeholder="Chọn trạng thái khách"
                 onChange={onSubmit}
