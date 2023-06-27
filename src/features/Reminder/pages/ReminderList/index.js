@@ -175,7 +175,11 @@ function ReminderList(props) {
     teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false,
     User: auth?.Info?.User
   }))
-  const { pathname, state } = useLocation()
+  const { pathname, state, search } = useLocation()
+
+  const query = new URLSearchParams(search)
+  const isMy = query.get('auth') === 'my';
+
   const [ListReminder, setListReminder] = useState([])
   const [loading, setLoading] = useState(false)
   const [PageCount, setPageCount] = useState(0)
@@ -186,14 +190,14 @@ function ReminderList(props) {
     state?.filters
       ? state?.filters
       : {
-          DateTo: '', // DD-MM-YYYY
-          DateFrom: '', // DD-MM-YYYY
+          DateTo: isMy ? new Date() : '', // DD-MM-YYYY
+          DateFrom: isMy ? new Date() : '', // DD-MM-YYYY
           StockID: CrStockID,
           IsNoti: {
             value: 0,
             label: 'Chưa nhắc'
           }, // 0, 1
-          UserID: !teleAdv
+          UserID: !teleAdv || isMy
             ? {
                 label: User.FullName,
                 value: User.ID
@@ -206,6 +210,7 @@ function ReminderList(props) {
 
   const { onOpenSidebar } = useContext(ReminderContext)
   const { width } = useWindowSize()
+
   useEffect(() => {
     getListReminder()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -327,7 +332,9 @@ function ReminderList(props) {
           <div>
             <button
               type="button"
-              className={`fw-500 cursor-pointer btn btn-sm btn-${rowData?.IsNoti ? "danger":"success"} py-5px`}
+              className={`fw-500 cursor-pointer btn btn-sm btn-${
+                rowData?.IsNoti ? 'danger' : 'success'
+              } py-5px`}
               disabled={!teleAdv}
               onClick={() => onSubmit(rowData)}
             >

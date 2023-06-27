@@ -223,6 +223,7 @@ function PickerReminder({ children, data, onRefresh }) {
                   timeOut: 1500
                 }
               )
+            window.getListReminder && window.getListReminder()
             document.body.click()
           })
         })
@@ -250,6 +251,7 @@ function PickerReminder({ children, data, onRefresh }) {
             .deleteNotiMember(newData)
             .then(response => {
               getNotiList(false, () => {
+                window.getListReminder && window.getListReminder()
                 onRefresh(() => {
                   window.top?.toastr &&
                     window.top?.toastr.success('Xóa lịch nhắc thành công', '', {
