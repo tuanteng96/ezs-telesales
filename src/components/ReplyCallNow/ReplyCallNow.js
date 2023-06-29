@@ -10,6 +10,7 @@ import moment from 'moment'
 import 'moment/locale/vi'
 import telesalesApi from 'src/api/telesales.api'
 import Portal from 'react-overlays/cjs/Portal'
+import PickerStatus from './PickerStatus'
 
 moment.locale('vi')
 
@@ -51,12 +52,7 @@ function ReplyCallNow() {
         inValues.audioLink && inValues.audioLink.length > 0
           ? inValues.audioLink[0]
           : '',
-      TeleTags: inValues?.member?.TeleTags
-        ? {
-            label: inValues?.member?.TeleTags,
-            value: inValues?.member?.TeleTags
-          }
-        : '',
+      TeleTags: inValues?.member?.TeleTags,
       isReminder: false,
       noti: {
         MemberID: inValues?.member?.ID,
@@ -87,7 +83,7 @@ function ReplyCallNow() {
       items: [
         {
           MemberID: values?.noti?.MemberID,
-          TeleTags: values?.TeleTags ? values?.TeleTags?.value : ''
+          TeleTags: values?.TeleTags || ''
         }
       ]
     }
@@ -176,24 +172,27 @@ function ReplyCallNow() {
                 </div>
                 <div className="form-group mb-15px">
                   <label>Tags khách hàng</label>
-                  <SelectProgress
-                    isClearable
-                    name="TeleTags"
-                    className="w-100"
-                    placeholder="Chọn tags"
-                    onChange={otp => {
-                      setFieldValue('TeleTags', otp, false)
+                  <PickerStatus
+                    data={{
+                      TeleTags: values.TeleTags
                     }}
-                    value={values.TeleTags}
-                    menuPortalTarget={document.body}
-                    menuPosition="fixed"
-                    styles={{
-                      menuPortal: base => ({
-                        ...base,
-                        zIndex: 9999
-                      })
+                    onChange={(val, close) => {
+                      setFieldValue('TeleTags', val, false)
+                      close && close()
                     }}
-                  />
+                  >
+                    {({ open }) => (
+                      <div
+                        className="border py-9px cursor-pointer px-10px"
+                        style={{ borderRadius: '2px' }}
+                        onClick={open}
+                      >
+                        {values.TeleTags || (
+                          <span style={{ color: '#6e6e6e' }}>Chọn Tags</span>
+                        )}
+                      </div>
+                    )}
+                  </PickerStatus>
                 </div>
                 <div className="form-group mb-15px">
                   <label>Ghi chú</label>

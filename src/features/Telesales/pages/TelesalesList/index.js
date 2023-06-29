@@ -18,6 +18,7 @@ import { setFiltersTeles } from '../../TelesalesSlice'
 import SelectProgress from 'src/components/Selects/SelectProgress'
 import PickerHistory from './components/PickerHistory'
 import PickerReminder from './components/PickerReminder'
+import PickerStatus from './components/PickerStatus'
 
 moment.locale('vi')
 
@@ -183,7 +184,11 @@ const EditableCellProcess = ({
       onClick={() => handleClick()}
     >
       {!Editing && (
-        <>{value && value.length > 0 ? value.map(x => x.value).join(',') : 'Chọn trạng thái'}</>
+        <>
+          {value && value.length > 0
+            ? value.map(x => x.value).join(',')
+            : 'Chọn trạng thái'}
+        </>
       )}
       {Editing && target && (
         <Overlay
@@ -345,12 +350,10 @@ function TelesalesList(props) {
       tele_process: filtersRedux.tele_process || '', //Đang tiếp cận,Đặt lịch thành công
       tele_user_id: filtersRedux.tele_user_id
         ? filtersRedux.tele_user_id
-        : !teleAdv
-        ? {
+        : {
             label: User.FullName,
             value: User.ID
-          }
-        : '',
+          },
       wishlist: filtersRedux.wishlist || '', // id,id san_pham
       birthDateFrom: filtersRedux.birthDateFrom || '', //31/12
       birthDateTo: filtersRedux.birthDateTo || '', //31/12
@@ -533,12 +536,19 @@ function TelesalesList(props) {
           width: 250,
           sortable: false,
           cellRenderer: ({ rowData, container }) => (
-            <EditableCellProcess
-              rowData={rowData}
-              container={container}
-              hideEditing={() => setIsEditing(false)}
-              showEditing={() => setIsEditing(true)}
-            />
+            <PickerStatus data={rowData} onRefresh={onRefresh}>
+              {({ open }) => (
+                <div onClick={open}>
+                  {rowData?.TeleTags ? rowData?.TeleTags : 'Chọn trạng thái'}
+                </div>
+              )}
+            </PickerStatus>
+            // <EditableCellProcess
+            //   rowData={rowData}
+            //   container={container}
+            //   hideEditing={() => setIsEditing(false)}
+            //   showEditing={() => setIsEditing(true)}
+            // />
           )
         },
         {
