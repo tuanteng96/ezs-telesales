@@ -24,10 +24,15 @@ function PickerStatus({ children, data, onRefresh }) {
   const [loadingType, setLoadingType] = useState(false)
   const [btnLoading, setBtnLoading] = useState(false)
   const [initialValues, setInitialValues] = useState(initialValue)
+  const [Status, setStatus] = useState('')
 
   const { teleAdv } = useSelector(({ auth }) => ({
     teleAdv: auth?.Info?.rightsSum?.teleAdv || false
   }))
+
+  useEffect(() => {
+    setStatus(data?.TeleTags)
+  }, [data])
 
   useEffect(() => {
     let ListTypeTags = []
@@ -111,24 +116,33 @@ function PickerStatus({ children, data, onRefresh }) {
     telesalesApi
       .editTagsMember(newData)
       .then(response => {
-        onRefresh(() => {
-          setVisible(false)
-          setBtnLoading(false)
-          window.top?.toastr &&
-            window.top?.toastr.success('Đã cập nhập', '', {
-              timeOut: 1500
-            })
-        })
+        setVisible(false)
+        setBtnLoading(false)
+        window.top?.toastr &&
+          window.top?.toastr.success('Đã cập nhập', '', {
+            timeOut: 1500
+          })
+        setStatus(valuePost ? valuePost.join(',') : '')
+        // onRefresh(() => {
+        //   setVisible(false)
+        //   setBtnLoading(false)
+        //   window.top?.toastr &&
+        //     window.top?.toastr.success('Đã cập nhập', '', {
+        //       timeOut: 1500
+        //     })
+        // })
       })
       .catch(error => console.log(error))
   }
-
   return (
     <>
-      {children({
+      <div onClick={() => setVisible(true)}>
+        {Status ? Status : 'Chọn trạng thái'}
+      </div>
+      {/* {children({
         open: () => setVisible(true),
         close: () => setVisible(false)
-      })}
+      })} */}
       {createPortal(
         <Modal
           size="lg"

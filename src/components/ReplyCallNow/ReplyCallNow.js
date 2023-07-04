@@ -101,10 +101,12 @@ function ReplyCallNow() {
       if (newDataReminder.noti.Date) {
         await telesalesApi.addNotiMember(newDataReminder)
       }
-      window?.top?.getListTelesales && window?.top?.getListTelesales()
-      window.top.toastr.success('Cập nhập thành công')
-      setLoading(false)
-      setVisible(false)
+      window.updateMemberTelesale &&
+        window.updateMemberTelesale('#' + values?.noti?.MemberID).then(() => {
+          window.top.toastr.success('Cập nhập thành công')
+          setLoading(false)
+          setVisible(false)
+        })
     } catch (error) {
       console.log(error)
     }

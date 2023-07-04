@@ -458,6 +458,49 @@ function TelesalesList(props) {
 
   window.top.getListTelesales = getListTelesales
 
+  window.updateMemberTelesale = key => {
+    return new Promise(function (resolve, reject) {
+      const newFilter = {
+        withsNoti: true,
+        filter: {
+          tele_process: '',
+          tele_user_id: '',
+          wishlist: '',
+          birthDateFrom: '',
+          birthDateTo: '',
+          bookDateFrom: '',
+          bookDateTo: '',
+          last_used: '',
+          remains: '',
+          key: key,
+          emptyStaff: false,
+          NotiFrom: '',
+          NotiTo: '',
+          HasNoti: false,
+          StockID: '',
+          CreateFrom: '',
+          CreateTo: ''
+        },
+        pi: 1,
+        ps: 20
+      }
+      telesalesApi.getListMemberTelesales(newFilter).then(({ data }) => {
+        if (data && data.data && data.data.length > 0) {
+          let crMember = data.data[0]
+          let newList = ListTelesales ? [...ListTelesales] : []
+
+          let index = newList.findIndex(x => x.ID === crMember.ID)
+          if (index > -1) {
+            newList[index] = crMember
+          }
+
+          setListTelesales(newList)
+        }
+        resolve()
+      })
+    })
+  }
+
   const onRefresh = callback => {
     if (filters.pi > 1) {
       setFilters(prevState => ({ ...prevState, pi: 1 }))
@@ -536,13 +579,7 @@ function TelesalesList(props) {
           width: 250,
           sortable: false,
           cellRenderer: ({ rowData, container }) => (
-            <PickerStatus data={rowData} onRefresh={onRefresh}>
-              {({ open }) => (
-                <div onClick={open}>
-                  {rowData?.TeleTags ? rowData?.TeleTags : 'Chọn trạng thái'}
-                </div>
-              )}
-            </PickerStatus>
+            <PickerStatus data={rowData} onRefresh={onRefresh}></PickerStatus>
             // <EditableCellProcess
             //   rowData={rowData}
             //   container={container}
@@ -571,7 +608,7 @@ function TelesalesList(props) {
           title: 'Lịch sử chăm sóc',
           cellRenderer: ({ rowData }) => (
             <PickerHistory data={rowData} onRefresh={onRefresh}>
-              {({ open }) => (
+              {/* {({ open }) => (
                 <div onClick={open}>
                   {rowData.TopTele && rowData.TopTele.length > 0 ? (
                     <div className="d-flex flex-column">
@@ -602,7 +639,7 @@ function TelesalesList(props) {
                     <>Chưa có liên hệ</>
                   )}
                 </div>
-              )}
+              )} */}
             </PickerHistory>
           ),
           dataKey: 'TopTele',
@@ -617,7 +654,7 @@ function TelesalesList(props) {
           sortable: false,
           cellRenderer: ({ rowData, container }) => (
             <PickerReminder data={rowData} onRefresh={onRefresh}>
-              {({ open }) => (
+              {/* {({ open }) => (
                 <div onClick={open}>
                   <div>
                     {rowData.NotiList && rowData.NotiList.length > 0 ? (
@@ -647,7 +684,7 @@ function TelesalesList(props) {
                     )}
                   </div>
                 </div>
-              )}
+              )} */}
             </PickerReminder>
           )
         },

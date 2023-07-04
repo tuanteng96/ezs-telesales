@@ -8,6 +8,7 @@ import { AssetsHelpers } from 'src/helpers/AssetsHelpers'
 import Swal from 'sweetalert2'
 import { useSelector } from 'react-redux'
 import * as Yup from 'yup'
+import Text from 'react-texty'
 
 import moment from 'moment'
 import 'moment/locale/vi'
@@ -81,16 +82,24 @@ function PickerHistory({ children, data, onRefresh }) {
       .addCareHistory(newData)
       .then(response => {
         getCareHistoryList(false, () => {
-          onRefresh(() => {
-            setBtnLoading(false)
-            setLoading(false)
-            resetForm()
-            window.top?.toastr &&
-              window.top?.toastr.success('Thêm mới lịch sử thành công', '', {
-                timeOut: 1500
-              })
-            document.body.click()
-          })
+          setBtnLoading(false)
+          setLoading(false)
+          resetForm()
+          window.top?.toastr &&
+            window.top?.toastr.success('Thêm mới lịch sử thành công', '', {
+              timeOut: 1500
+            })
+          document.body.click()
+          // onRefresh(() => {
+          //   setBtnLoading(false)
+          //   setLoading(false)
+          //   resetForm()
+          //   window.top?.toastr &&
+          //     window.top?.toastr.success('Thêm mới lịch sử thành công', '', {
+          //       timeOut: 1500
+          //     })
+          //   document.body.click()
+          // })
         })
       })
       .catch(error => console.log(error))
@@ -116,13 +125,18 @@ function PickerHistory({ children, data, onRefresh }) {
             .addCareHistory(newData)
             .then(response => {
               getCareHistoryList(false, () => {
-                onRefresh(() => {
-                  window.top?.toastr &&
-                    window.top?.toastr.success('Xóa lịch sử thành công', '', {
-                      timeOut: 1500
-                    })
-                  resolve()
-                })
+                window.top?.toastr &&
+                  window.top?.toastr.success('Xóa lịch sử thành công', '', {
+                    timeOut: 1500
+                  })
+                resolve()
+                // onRefresh(() => {
+                //   window.top?.toastr &&
+                //     window.top?.toastr.success('Xóa lịch sử thành công', '', {
+                //       timeOut: 1500
+                //     })
+                //   resolve()
+                // })
               })
             })
             .catch(error => console.log(error))
@@ -133,10 +147,72 @@ function PickerHistory({ children, data, onRefresh }) {
 
   return (
     <>
-      {children({
+      <div onClick={() => setVisible(true)}>
+        {List.length > 0 || (data.TopTele && data.TopTele.length > 0) ? (
+          <>
+            {List.length > 0 ? (
+              <>
+                <div className="d-flex flex-column">
+                  <div>
+                    {moment(List[0].CreateDate).format('HH:mm DD-MM-YYYY')}
+                    {List[0].Audio && (
+                      <a
+                        className="ml-10px"
+                        href={'/upload/image/' + List[0].Audio}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <i className="fas fa-play"></i>
+                      </a>
+                    )}
+                  </div>
+                  <Text
+                    className="flex-1 pr-10px"
+                    style={{ width: '260px' }}
+                    tooltipMaxWidth={280}
+                  >
+                    {List[0].Content}
+                  </Text>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="d-flex flex-column">
+                  <div>
+                    {moment(data.TopTele[0].CreateDate).format(
+                      'HH:mm DD-MM-YYYY'
+                    )}
+                    {data.TopTele[0].Audio && (
+                      <a
+                        className="ml-10px"
+                        href={'/upload/image/' + data.TopTele[0].Audio}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <i className="fas fa-play"></i>
+                      </a>
+                    )}
+                  </div>
+                  <Text
+                    className="flex-1 pr-10px"
+                    style={{ width: '260px' }}
+                    tooltipMaxWidth={280}
+                  >
+                    {data.TopTele[0].Content}
+                  </Text>
+                </div>
+              </>
+            )}
+          </>
+        ) : (
+          <>Thêm lịch nhắc</>
+        )}
+      </div>
+
+      {/* {children({
         open: () => setVisible(true),
         close: () => setVisible(false)
-      })}
+      })} */}
       {createPortal(
         <Modal
           show={visible}

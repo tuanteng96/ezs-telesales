@@ -10,7 +10,7 @@ import Swal from 'sweetalert2'
 import { useSelector } from 'react-redux'
 import * as Yup from 'yup'
 import DatePicker from 'react-datepicker'
-
+import Text from 'react-texty'
 import moment from 'moment'
 import 'moment/locale/vi'
 import { Formik, Form } from 'formik'
@@ -209,23 +209,38 @@ function PickerReminder({ children, data, onRefresh }) {
       .addNotiMember(newData)
       .then(response => {
         getNotiList(false, () => {
-          onRefresh(() => {
-            resetForm()
-            setBtnLoading(false)
-            setLoading(false)
-            window.top?.toastr &&
-              window.top?.toastr.success(
-                values.noti?.ID > 0
-                  ? 'Cập nhập lịch nhắc thành công'
-                  : 'Thêm mới lịch nhắc thành công',
-                '',
-                {
-                  timeOut: 1500
-                }
-              )
-            window.getListReminder && window.getListReminder()
-            document.body.click()
-          })
+          resetForm()
+          setBtnLoading(false)
+          setLoading(false)
+          window.top?.toastr &&
+            window.top?.toastr.success(
+              values.noti?.ID > 0
+                ? 'Cập nhập lịch nhắc thành công'
+                : 'Thêm mới lịch nhắc thành công',
+              '',
+              {
+                timeOut: 1500
+              }
+            )
+          window.getListReminder && window.getListReminder()
+          document.body.click()
+          // onRefresh(() => {
+          //   resetForm()
+          //   setBtnLoading(false)
+          //   setLoading(false)
+          //   window.top?.toastr &&
+          //     window.top?.toastr.success(
+          //       values.noti?.ID > 0
+          //         ? 'Cập nhập lịch nhắc thành công'
+          //         : 'Thêm mới lịch nhắc thành công',
+          //       '',
+          //       {
+          //         timeOut: 1500
+          //       }
+          //     )
+          //   window.getListReminder && window.getListReminder()
+          //   document.body.click()
+          // })
         })
       })
       .catch(error => console.log(error))
@@ -252,13 +267,18 @@ function PickerReminder({ children, data, onRefresh }) {
             .then(response => {
               getNotiList(false, () => {
                 window.getListReminder && window.getListReminder()
-                onRefresh(() => {
-                  window.top?.toastr &&
-                    window.top?.toastr.success('Xóa lịch nhắc thành công', '', {
-                      timeOut: 1500
-                    })
-                  resolve()
-                })
+                // onRefresh(() => {
+                //   window.top?.toastr &&
+                //     window.top?.toastr.success('Xóa lịch nhắc thành công', '', {
+                //       timeOut: 1500
+                //     })
+                //   resolve()
+                // })
+                window.top?.toastr &&
+                  window.top?.toastr.success('Xóa lịch nhắc thành công', '', {
+                    timeOut: 1500
+                  })
+                resolve()
               })
             })
             .catch(error => console.log(error))
@@ -269,10 +289,56 @@ function PickerReminder({ children, data, onRefresh }) {
 
   return (
     <>
-      {children({
+      {/* {children({
         open: () => setVisible(true),
         close: () => setVisible(false)
-      })}
+      })} */}
+      <div onClick={() => setVisible(true)}>
+        {List.length > 0 || (data.NotiList && data.NotiList.length > 0) ? (
+          <>
+            {List.length > 0 ? (
+              <>
+                <div className="mt-8px fw-500">
+                  Ngày nhắc
+                  <span className="pl-5px">
+                    {moment(List[0].Date).format('DD-MM-YYYY')}
+                  </span>
+                  {List[0].IsNoti && (
+                    <span className="pl-5px font-size-xs text-success">
+                      - Đã nhắc
+                    </span>
+                  )}
+                </div>
+                <Text style={{ width: '230px' }} tooltipMaxWidth={250}>
+                  Nội dung :
+                  <span className="fw-500 pl-3px">{List[0].Desc}</span>
+                </Text>
+              </>
+            ) : (
+              <>
+                <div className="mt-8px fw-500">
+                  Ngày nhắc
+                  <span className="pl-5px">
+                    {moment(data.NotiList[0].Date).format('DD-MM-YYYY')}
+                  </span>
+                  {data.NotiList[0].IsNoti && (
+                    <span className="pl-5px font-size-xs text-success">
+                      - Đã nhắc
+                    </span>
+                  )}
+                </div>
+                <Text style={{ width: '230px' }} tooltipMaxWidth={250}>
+                  Nội dung :
+                  <span className="fw-500 pl-3px">{data.NotiList[0].Desc}</span>
+                </Text>
+              </>
+            )}
+          </>
+        ) : (
+          <>Thêm lịch nhắc</>
+        )}
+      </div>
+
       {createPortal(
         <Modal
           show={visible}
