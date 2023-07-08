@@ -335,7 +335,6 @@ function ReminderList(props) {
               className={`fw-500 cursor-pointer btn btn-sm btn-${
                 rowData?.IsNoti ? 'danger' : 'success'
               } py-5px`}
-              disabled={!teleAdv}
               onClick={() => onSubmit(rowData)}
             >
               {rowData?.IsNoti ? 'Chưa nhắc' : 'Thực hiện'}
