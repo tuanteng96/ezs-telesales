@@ -14,7 +14,8 @@ moment.locale('vi')
 
 const initialValue = {
   TeleTags: '',
-  TeleTagsKH: ''
+  TeleTagsKH: '',
+  TeleStar: ''
 }
 
 function PickerStatus({ children, data, onRefresh }) {
@@ -37,13 +38,19 @@ function PickerStatus({ children, data, onRefresh }) {
   useEffect(() => {
     let ListTypeTags = []
     let ListTypeTagsKH = []
-
+    let ListTypeStar = []
     if (ListType && ListType.length > 0) {
       for (let type of ListType) {
         if (type.Title === 'Tag khách hàng') {
           if (type.Children) {
             for (let x of type.Children) {
               ListTypeTagsKH.push(x)
+            }
+          }
+        } else if (type.Title === 'Đánh giá') {
+          if (type.Children) {
+            for (let x of type.Children) {
+              ListTypeStar.push(x)
             }
           }
         } else {
@@ -56,9 +63,10 @@ function PickerStatus({ children, data, onRefresh }) {
       }
     }
 
-    let TeleTagsArr = data?.TeleTags ? data?.TeleTags.split(',') : []
+    let TeleTagsArr = Status ? Status.split(',') : data?.TeleTags ? data?.TeleTags.split(',') : []
     let newTeleTags = ''
     let newTeleTagsKH = ''
+    let newTeleStar = ''
 
     for (let x of TeleTagsArr) {
       if (ListTypeTags.some(s => x === s.Title)) {
@@ -67,12 +75,16 @@ function PickerStatus({ children, data, onRefresh }) {
       if (ListTypeTagsKH.some(s => x === s.Title)) {
         newTeleTagsKH = x
       }
+      if (ListTypeStar.some(s => x === s.Title)) {
+        newTeleStar = x
+      }
     }
 
     setInitialValues(prevState => ({
       ...prevState,
       TeleTags: newTeleTags,
-      TeleTagsKH: newTeleTagsKH
+      TeleTagsKH: newTeleTagsKH,
+      TeleStar: newTeleStar
     }))
   }, [data, ListType])
 
@@ -95,11 +107,14 @@ function PickerStatus({ children, data, onRefresh }) {
       console.log(error)
     }
   }
-
-  const onSubmit = ({ TeleTags, TeleTagsKH, ...values }, { resetForm }) => {
+  const onSubmit = (
+    { TeleTags, TeleTagsKH, TeleStar, ...values },
+    { resetForm }
+  ) => {
     let valueWrap = [
       ...(TeleTags ? TeleTags.split(',') : []),
-      ...(TeleTagsKH ? TeleTagsKH.split(',') : [])
+      ...(TeleTagsKH ? TeleTagsKH.split(',') : []),
+      ...(TeleStar ? TeleStar.split(',') : [])
     ]
     var valuePost = valueWrap ? [...new Set(valueWrap)] : ''
 
@@ -161,7 +176,6 @@ function PickerStatus({ children, data, onRefresh }) {
             {formikProps => {
               const { values, handleBlur, handleChange, setFieldValue } =
                 formikProps
-
               return (
                 <Form className="h-100 d-flex flex-column">
                   <Modal.Header closeButton>
@@ -186,7 +200,9 @@ function PickerStatus({ children, data, onRefresh }) {
                         <>
                           {ListType &&
                             ListType.filter(
-                              x => x.Title !== 'Tag khách hàng'
+                              x =>
+                                x.Title !== 'Tag khách hàng' &&
+                                x.Title !== 'Đánh giá'
                             ).map((type, index) => (
                               <div className="mb-15px form-group" key={index}>
                                 <label className="font-label fw-700 font-size-15px">
@@ -222,6 +238,47 @@ function PickerStatus({ children, data, onRefresh }) {
                                 </div>
                               </div>
                             ))}
+                          {ListType &&
+                            ListType.filter(x => x.Title === 'Đánh giá').map(
+                              (type, index) => (
+                                <div className="mb-15px form-group" key={index}>
+                                  <label className="font-label fw-700 font-size-15px">
+                                    {type.Title}
+                                  </label>
+                                  <div className="checkbox-list mt-8px">
+                                    {type.Children &&
+                                      type.Children.map((x, idx) => (
+                                        <label
+                                          className="checkbox d-flex cursor-pointer"
+                                          key={idx}
+                                        >
+                                          <input
+                                            type="checkbox"
+                                            name="TeleStar"
+                                            value={x.Title}
+                                            onChange={evt => {
+                                              let { checked, value } =
+                                                evt.target
+                                              setFieldValue(
+                                                'TeleStar',
+                                                checked ? value : ''
+                                              )
+                                            }}
+                                            onBlur={handleBlur}
+                                            checked={
+                                              values.TeleStar === x.Title
+                                            }
+                                          />
+                                          <span className="checkbox-icon"></span>
+                                          <span className="fw-500 font-label font-size-15px">
+                                            {x.Title}
+                                          </span>
+                                        </label>
+                                      ))}
+                                  </div>
+                                </div>
+                              )
+                            )}
                           {ListType &&
                             ListType.filter(
                               x => x.Title === 'Tag khách hàng'

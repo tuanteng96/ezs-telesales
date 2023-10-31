@@ -178,7 +178,7 @@ function ReminderList(props) {
   const { pathname, state, search } = useLocation()
 
   const query = new URLSearchParams(search)
-  const isMy = query.get('auth') === 'my';
+  const isMy = query.get('auth') === 'my'
 
   const [ListReminder, setListReminder] = useState([])
   const [loading, setLoading] = useState(false)
@@ -197,12 +197,13 @@ function ReminderList(props) {
             value: 0,
             label: 'Chưa nhắc'
           }, // 0, 1
-          UserID: !teleAdv || isMy
-            ? {
-                label: User.FullName,
-                value: User.ID
-              }
-            : '',
+          UserID:
+            !teleAdv || isMy
+              ? {
+                  label: User.FullName,
+                  value: User.ID
+                }
+              : '',
           Pi: 1,
           Ps: 15
         }
