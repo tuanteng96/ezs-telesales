@@ -4,18 +4,17 @@ import telesalesApi from 'src/api/telesales.api'
 import ReactBaseTableInfinite from 'src/components/Tables/ReactBaseTableInfinite'
 import Sidebar from './components/Sidebar'
 import { Overlay } from 'react-bootstrap'
-import { AssetsHelpers } from 'src/helpers/AssetsHelpers'
 import SelectStaffs from 'src/components/Selects/SelectStaffs'
 import { TelesalesContext } from '../..'
 import { useWindowSize } from 'src/hooks/useWindowSize'
 import Text from 'react-texty'
 import ReminderCalendar from './components/ReminderCalendar'
 import Navbar from 'src/components/Navbar/Navbar'
+import Select from 'react-select'
 
 import moment from 'moment'
 import 'moment/locale/vi'
 import { setFiltersTeles } from '../../TelesalesSlice'
-import SelectProgress from 'src/components/Selects/SelectProgress'
 import PickerHistory from './components/PickerHistory'
 import PickerReminder from './components/PickerReminder'
 import PickerStatus from './components/PickerStatus'
@@ -127,30 +126,41 @@ const EditableCell = ({ rowData, container, showEditing, hideEditing }) => {
   )
 }
 
-const EditableCellProcess = ({
+const EditableCellSupport = ({
   rowData,
   container,
   showEditing,
   hideEditing
 }) => {
+  const { teleAdv } = useSelector(({ auth }) => ({
+    teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false
+  }))
   const [Editing, setEditing] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const [value, setValue] = useState(
-    rowData?.TeleTags
-      ? rowData?.TeleTags.split(',').map(x => ({ label: x, value: x }))
+    rowData?.UserSupport
+      ? {
+          label: rowData?.UserSupport?.FullName,
+          value: rowData?.UserSupport?.ID
+        }
       : null
   )
   const target = useRef(null)
 
   useEffect(() => {
     setValue(
-      rowData?.TeleTags
-        ? rowData?.TeleTags.split(',').map(x => ({ label: x, value: x }))
+      rowData?.UserSupport
+        ? {
+            label: rowData?.UserSupport?.FullName,
+            value: rowData?.UserSupport?.ID
+          }
         : null
     )
-  }, [rowData?.TeleTags])
+  }, [rowData?.UserSupport])
 
   const handleClick = () => {
+    if (!teleAdv) return
     setEditing(true)
     showEditing()
   }
@@ -161,18 +171,20 @@ const EditableCellProcess = ({
   }
 
   const onSubmit = options => {
-    let newData = {
-      items: [
+    setLoading(true)
+    const newData = {
+      arr: [
         {
-          MemberID: rowData?.ID,
-          TeleTags: options ? options.map(x => x.value).join(',') : ''
+          ID: rowData.ID,
+          UserSupportID: options ? options.value : null
         }
       ]
     }
     telesalesApi
-      .editTagsMember(newData)
+      .updateMemberIDTelesales(newData)
       .then(response => {
         setValue(options)
+        setLoading(false)
       })
       .catch(error => console.log(error))
   }
@@ -185,9 +197,10 @@ const EditableCellProcess = ({
     >
       {!Editing && (
         <>
-          {value && value.length > 0
-            ? value.map(x => x.value).join(',')
-            : 'Chọn trạng thái'}
+          {value ? value.label : 'Chọn Support'}
+          {teleAdv && (
+            <i className="fa-solid fa-user-pen pl-8px font-size-base text-muted"></i>
+          )}
         </>
       )}
       {Editing && target && (
@@ -204,17 +217,370 @@ const EditableCellProcess = ({
               {...props}
               style={{
                 position: 'absolute',
-                width: 220,
+                width: 190,
                 ...props.style
               }}
             >
-              <SelectProgress
-                //isDisabled={loading}
-                isMulti
-                className="w-100 flex-1"
-                placeholder="Chọn trạng thái khách"
-                onChange={onSubmit}
+              <SelectStaffs
+                classNamePrefix="select"
+                isLoading={loading}
+                className="select-control"
+                //menuPosition="fixed"
+                name="UserSupportID"
+                //menuIsOpen={true}
+                onChange={otp => {
+                  onSubmit(otp)
+                }}
                 value={value}
+                isClearable={true}
+                adv={true}
+              />
+            </div>
+          )}
+        </Overlay>
+      )}
+    </div>
+  )
+}
+
+const EditableCellType = ({ rowData, container, showEditing, hideEditing }) => {
+  const { teleAdv } = useSelector(({ auth }) => ({
+    teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false
+  }))
+  const [Editing, setEditing] = useState(false)
+  const [loading, setLoading] = useState(false)
+
+  const [value, setValue] = useState(
+    rowData?.Type
+      ? {
+          label: rowData?.Type,
+          value: rowData?.Type
+        }
+      : null
+  )
+  const target = useRef(null)
+
+  useEffect(() => {
+    setValue(
+      rowData?.Type
+        ? {
+            label: rowData?.Type,
+            value: rowData?.Type
+          }
+        : null
+    )
+  }, [rowData?.Type])
+
+  const handleClick = () => {
+    if (!teleAdv) return
+    setEditing(true)
+    showEditing()
+  }
+
+  const handleHide = () => {
+    setEditing(false)
+    hideEditing()
+  }
+
+  const onSubmit = options => {
+    setLoading(true)
+    const newData = {
+      arr: [
+        {
+          ID: rowData.ID,
+          Type: options ? options.value : ''
+        }
+      ]
+    }
+    telesalesApi
+      .updateMemberIDTelesales(newData)
+      .then(response => {
+        setValue(options)
+        setLoading(false)
+      })
+      .catch(error => console.log(error))
+  }
+
+  return (
+    <div
+      className="h-100 d-flex align-items-center cursor-pointer"
+      ref={target}
+      onClick={() => handleClick()}
+    >
+      {!Editing && <>{value ? value.label : 'Chọn loại'}</>}
+      {Editing && target && (
+        <Overlay
+          target={target.current}
+          show={Editing}
+          placement="right"
+          //container={container}
+          onHide={handleHide}
+          rootClose
+        >
+          {({ placement, arrowProps, show: _show, popper, ...props }) => (
+            <div
+              {...props}
+              style={{
+                position: 'absolute',
+                width: 190,
+                ...props.style
+              }}
+            >
+              <Select
+                isLoading={loading}
+                className="select-control"
+                classNamePrefix="select"
+                placeholder="Chọn loại"
+                //menuPosition="fixed"
+                name="Type"
+                //menuIsOpen={true}
+                onChange={otp => {
+                  onSubmit(otp)
+                }}
+                value={value}
+                isClearable={true}
+                options={[
+                  {
+                    label: 'Khách hàng công ty',
+                    value: 'Khách hàng công ty'
+                  },
+                  {
+                    label: 'Sale tìm kiếm',
+                    value: 'Sale tìm kiếm'
+                  }
+                ]}
+              />
+            </div>
+          )}
+        </Overlay>
+      )}
+    </div>
+  )
+}
+
+const EditableCellIsCoop = ({
+  rowData,
+  container,
+  showEditing,
+  hideEditing
+}) => {
+  const { teleAdv } = useSelector(({ auth }) => ({
+    teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false
+  }))
+  const [Editing, setEditing] = useState(false)
+  const [loading, setLoading] = useState(false)
+
+  const [value, setValue] = useState({
+    label: rowData?.IsCoop ? 'Có' : 'Không',
+    value: rowData?.IsCoop
+  })
+  const target = useRef(null)
+
+  useEffect(() => {
+    setValue({
+      label: rowData?.IsCoop ? 'Có' : 'Không',
+      value: rowData?.IsCoop
+    })
+  }, [rowData?.IsCoop])
+
+  const handleClick = () => {
+    if (!teleAdv) return
+    setEditing(true)
+    showEditing()
+  }
+
+  const handleHide = () => {
+    setEditing(false)
+    hideEditing()
+  }
+
+  const onSubmit = options => {
+    setLoading(true)
+    const newData = {
+      arr: [
+        {
+          ID: rowData.ID,
+          IsCoop: options ? options.value : ''
+        }
+      ]
+    }
+    telesalesApi
+      .updateMemberIDTelesales(newData)
+      .then(response => {
+        setValue(options)
+        setLoading(false)
+      })
+      .catch(error => console.log(error))
+  }
+
+  return (
+    <div
+      className="h-100 d-flex align-items-center cursor-pointer"
+      ref={target}
+      onClick={() => handleClick()}
+    >
+      {!Editing && <>{value ? value.label : 'Chọn'}</>}
+      {Editing && target && (
+        <Overlay
+          target={target.current}
+          show={Editing}
+          placement="right"
+          //container={container}
+          onHide={handleHide}
+          rootClose
+        >
+          {({ placement, arrowProps, show: _show, popper, ...props }) => (
+            <div
+              {...props}
+              style={{
+                position: 'absolute',
+                width: 190,
+                ...props.style
+              }}
+            >
+              <Select
+                isLoading={loading}
+                className="select-control"
+                classNamePrefix="select"
+                placeholder="Chọn"
+                //menuPosition="fixed"
+                name="IsCoop"
+                //menuIsOpen={true}
+                onChange={otp => {
+                  onSubmit(otp)
+                }}
+                value={value}
+                isClearable={false}
+                options={[
+                  {
+                    label: 'Có',
+                    value: true
+                  },
+                  {
+                    label: 'Không',
+                    value: false
+                  }
+                ]}
+              />
+            </div>
+          )}
+        </Overlay>
+      )}
+    </div>
+  )
+}
+
+const EditableCellStatus = ({
+  rowData,
+  container,
+  showEditing,
+  hideEditing
+}) => {
+  const { teleAdv } = useSelector(({ auth }) => ({
+    teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false
+  }))
+  const [Editing, setEditing] = useState(false)
+  const [loading, setLoading] = useState(false)
+
+  const [value, setValue] = useState(
+    rowData?.Status
+      ? {
+          label: rowData?.Status,
+          value: rowData?.Status
+        }
+      : null
+  )
+  const target = useRef(null)
+
+  useEffect(() => {
+    setValue(
+      rowData?.Status
+        ? {
+            label: rowData?.Status,
+            value: rowData?.Status
+          }
+        : null
+    )
+  }, [rowData?.Status])
+
+  const handleClick = () => {
+    if (!teleAdv) return
+    setEditing(true)
+    showEditing()
+  }
+
+  const handleHide = () => {
+    setEditing(false)
+    hideEditing()
+  }
+
+  const onSubmit = options => {
+    setLoading(true)
+    const newData = {
+      arr: [
+        {
+          ID: rowData.ID,
+          Status: options ? options.value : null
+        }
+      ]
+    }
+    telesalesApi
+      .updateMemberIDTelesales(newData)
+      .then(response => {
+        setValue(options)
+        setLoading(false)
+      })
+      .catch(error => console.log(error))
+  }
+
+  return (
+    <div
+      className="h-100 d-flex align-items-center cursor-pointer"
+      ref={target}
+      onClick={() => handleClick()}
+    >
+      {!Editing && <>{value ? value.label : 'Chọn tình trạng'}</>}
+      {Editing && target && (
+        <Overlay
+          target={target.current}
+          show={Editing}
+          placement="right"
+          //container={container}
+          onHide={handleHide}
+          rootClose
+        >
+          {({ placement, arrowProps, show: _show, popper, ...props }) => (
+            <div
+              {...props}
+              style={{
+                position: 'absolute',
+                width: 190,
+                ...props.style
+              }}
+            >
+              <Select
+                isLoading={loading}
+                className="select-control"
+                classNamePrefix="select"
+                placeholder="Chọn"
+                //menuPosition="fixed"
+                name="Status"
+                //menuIsOpen={true}
+                onChange={otp => {
+                  onSubmit(otp)
+                }}
+                value={value}
+                isClearable={false}
+                options={[
+                  {
+                    label: 'Đang hoạt động',
+                    value: 'Đang hoạt động'
+                  },
+                  {
+                    label: 'Đã hết hạn hoặc bỏ',
+                    value: 'Đã hết hạn hoặc bỏ'
+                  }
+                ]}
               />
             </div>
           )}
@@ -321,10 +687,112 @@ const EditableCellNote = ({ rowData, container, showEditing, hideEditing }) => {
   )
 }
 
+const EditableCellSoftLink = ({
+  rowData,
+  container,
+  showEditing,
+  hideEditing
+}) => {
+  const [Editing, setEditing] = useState(false)
+
+  const [value, setValue] = useState(rowData?.SoftLink)
+  const target = useRef(null)
+  const typingTimeoutRef = useRef(null)
+
+  useEffect(() => {
+    setValue(rowData?.SoftLink)
+  }, [rowData?.SoftLink])
+
+  const handleClick = () => {
+    setEditing(true)
+    showEditing()
+  }
+
+  const handleHide = () => {
+    setEditing(false)
+    hideEditing()
+  }
+
+  const onSubmit = e => {
+    const value = e.target.value
+
+    const newData = {
+      arr: [
+        {
+          ID: rowData.ID,
+          SoftLink: value
+        }
+      ]
+    }
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current)
+    }
+    typingTimeoutRef.current = setTimeout(() => {
+      telesalesApi
+        .updateMemberIDTelesales(newData)
+        .then(response => {
+          //setValue(value)
+        })
+        .catch(error => console.log(error))
+    }, 300)
+  }
+
+  return (
+    <div
+      className="h-100 d-flex align-items-center cursor-pointer w-full"
+      ref={target}
+      onClick={() => handleClick()}
+    >
+      {!Editing && (
+        <div
+          className="text-truncate"
+          style={{
+            width: 290
+          }}
+        >
+          <Text tooltipMaxWidth={290}>{value || 'Nhập link phần mềm'}</Text>
+        </div>
+      )}
+      {Editing && target && (
+        <Overlay
+          target={target.current}
+          show={Editing}
+          placement="right"
+          //container={container}
+          onHide={handleHide}
+          rootClose
+        >
+          {({ placement, arrowProps, show: _show, popper, ...props }) => (
+            <div
+              {...props}
+              style={{
+                position: 'absolute',
+                width: 260,
+                ...props.style
+              }}
+            >
+              <div>
+                <textarea
+                  className="w-100 form-control p-12px fw-500"
+                  rows="4"
+                  placeholder="Nhập link"
+                  onChange={e => setValue(e.target.value)}
+                  onBlur={onSubmit}
+                  value={value}
+                ></textarea>
+              </div>
+            </div>
+          )}
+        </Overlay>
+      )}
+    </div>
+  )
+}
+
 const columnsSort = window?.top?.GlobalConfig?.Admin?.kpiSortColumn || null
 
 function TelesalesList(props) {
-  const { User, teleAdv, CrStockID, filtersRedux } = useSelector(
+  const { User, CrStockID, filtersRedux } = useSelector(
     ({ auth, telesales }) => ({
       User: auth?.Info?.User,
       teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false,
@@ -512,21 +980,22 @@ function TelesalesList(props) {
     }
   }
 
-  const callNow = phone => {
-    if (!phone) return
-    setLoadingCall(phone)
-    telesalesApi
-      .callNow({ Phone: phone })
-      .then(({ data }) => {
-        if (data?.error) {
-          window?.top?.toastr?.error(data?.error, '', { timeOut: 1000 })
-        }
-        setLoadingCall('')
-      })
-      .catch(err => {
-        console.log(err)
-      })
-  }
+  // const callNow = phone => {
+  //   if (!phone) return
+  //   setLoadingCall(phone)
+  //   telesalesApi
+  //     .callNow({ Phone: phone })
+  //     .then(({ data }) => {
+  //       if (data?.error) {
+  //         window?.top?.toastr?.error(data?.error, '', { timeOut: 1000 })
+  //       }
+  //       setLoadingCall('')
+  //     })
+  //     .catch(err => {
+  //       console.log(err)
+  //     })
+  // }
+
   const columns = useMemo(
     () => {
       let newColumns = [
@@ -573,6 +1042,36 @@ function TelesalesList(props) {
           sortable: false
         },
         {
+          key: 'Type',
+          title: 'Loại khách hàng',
+          dataKey: 'Type',
+          width: 220,
+          sortable: false,
+          cellRenderer: ({ rowData, container }) => (
+            <EditableCellType
+              rowData={rowData}
+              container={container}
+              hideEditing={() => setIsEditing(false)}
+              showEditing={() => setIsEditing(true)}
+            />
+          )
+        },
+        {
+          key: 'IsCoop',
+          title: 'Cộng tác viên',
+          dataKey: 'IsCoop',
+          width: 220,
+          sortable: false,
+          cellRenderer: ({ rowData, container }) => (
+            <EditableCellIsCoop
+              rowData={rowData}
+              container={container}
+              hideEditing={() => setIsEditing(false)}
+              showEditing={() => setIsEditing(true)}
+            />
+          )
+        },
+        {
           key: 'TeleTags',
           title: 'Trạng thái',
           dataKey: 'TeleTags',
@@ -586,6 +1085,36 @@ function TelesalesList(props) {
             //   hideEditing={() => setIsEditing(false)}
             //   showEditing={() => setIsEditing(true)}
             // />
+          )
+        },
+        {
+          key: 'Status',
+          title: 'Tình trạng',
+          dataKey: 'Status',
+          width: 220,
+          sortable: false,
+          cellRenderer: ({ rowData, container }) => (
+            <EditableCellStatus
+              rowData={rowData}
+              container={container}
+              hideEditing={() => setIsEditing(false)}
+              showEditing={() => setIsEditing(true)}
+            />
+          )
+        },
+        {
+          key: 'SoftLink',
+          title: 'Link phần mềm',
+          dataKey: 'SoftLink',
+          width: 290,
+          sortable: false,
+          cellRenderer: ({ rowData, container }) => (
+            <EditableCellSoftLink
+              rowData={rowData}
+              container={container}
+              hideEditing={() => setIsEditing(false)}
+              showEditing={() => setIsEditing(true)}
+            />
           )
         },
         {
@@ -690,7 +1219,7 @@ function TelesalesList(props) {
         },
         {
           key: 'Staffs',
-          title: 'Nhân viên phụ trách',
+          title: 'Sale phụ trách',
           dataKey: 'Staffs',
           width: 220,
           sortable: false,
@@ -703,52 +1232,74 @@ function TelesalesList(props) {
             />
           )
         },
-
         {
-          key: 'action',
-          title: '',
-          dataKey: 'action',
-          cellRenderer: ({ rowData }) => (
-            <div className="d-flex">
-              <button
-                disabled={loadingCall !== ''}
-                type="button"
-                onClick={() => callNow(rowData?.MobilePhone)}
-                //href={`tel:${rowData?.MobilePhone}`}
-                className="w-38px h-38px rounded-circle btn btn-success shadow mx-4px p-0 position-relative"
-              >
-                {loadingCall === rowData?.MobilePhone ? (
-                  <div
-                    className="position-absolute d-flex align-items-center justify-content-center"
-                    style={{
-                      top: '50%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%)',
-                      width: '100%',
-                      height: '100%'
-                    }}
-                  >
-                    <div className="spinner-border text-white" role="status">
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
-                  </div>
-                ) : (
-                  <img
-                    className="w-23px position-absolute top-7px right-7px"
-                    src={AssetsHelpers.toAbsoluteUrl(
-                      '/_assets/images/icon-call.png'
-                    )}
-                    alt="Call"
-                  />
-                )}
-              </button>
-            </div>
-          ),
-          align: 'center',
-          width: 80,
+          key: 'UserSupportID',
+          title: 'Support phụ trách',
+          dataKey: 'UserSupportID',
+          width: 220,
           sortable: false,
-          frozen: width > 991 ? 'right' : false
+          cellRenderer: ({ rowData, container }) => (
+            <EditableCellSupport
+              rowData={rowData}
+              container={container}
+              hideEditing={() => setIsEditing(false)}
+              showEditing={() => setIsEditing(true)}
+            />
+          )
+        },
+        {
+          key: 'UserID',
+          title: 'Người tạo',
+          dataKey: 'UserID',
+          width: 220,
+          sortable: false,
+          cellRenderer: ({ rowData, container }) => rowData?.User?.FullName
         }
+        // {
+        //   key: 'action',
+        //   title: '',
+        //   dataKey: 'action',
+        //   cellRenderer: ({ rowData }) => (
+        //     <div className="d-flex">
+        //       <button
+        //         disabled={loadingCall !== ''}
+        //         type="button"
+        //         onClick={() => callNow(rowData?.MobilePhone)}
+        //         //href={`tel:${rowData?.MobilePhone}`}
+        //         className="w-38px h-38px rounded-circle btn btn-success shadow mx-4px p-0 position-relative"
+        //       >
+        //         {loadingCall === rowData?.MobilePhone ? (
+        //           <div
+        //             className="position-absolute d-flex align-items-center justify-content-center"
+        //             style={{
+        //               top: '50%',
+        //               left: '50%',
+        //               transform: 'translate(-50%, -50%)',
+        //               width: '100%',
+        //               height: '100%'
+        //             }}
+        //           >
+        //             <div className="spinner-border text-white" role="status">
+        //               <span className="visually-hidden">Loading...</span>
+        //             </div>
+        //           </div>
+        //         ) : (
+        //           <img
+        //             className="w-23px position-absolute top-7px right-7px"
+        //             src={AssetsHelpers.toAbsoluteUrl(
+        //               '/_assets/images/icon-call.png'
+        //             )}
+        //             alt="Call"
+        //           />
+        //         )}
+        //       </button>
+        //     </div>
+        //   ),
+        //   align: 'center',
+        //   width: 80,
+        //   sortable: false,
+        //   frozen: width > 991 ? 'right' : false
+        // }
       ]
       if (columnsSort && columnsSort.length > 0) {
         newColumns = newColumns.map(clm => {
@@ -835,7 +1386,7 @@ function TelesalesList(props) {
             pageCount={PageCount}
             onEndReachedThreshold={300}
             onEndReached={handleEndReached}
-            rowHeight={80}
+            rowHeight={100}
             onScroll={() => IsEditing && document.body.click()}
             //onPagesChange={onPagesChange}
             //rowRenderer={rowRenderer}

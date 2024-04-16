@@ -10,6 +10,9 @@ const telesalesApi = {
       JSON.stringify(data)
     )
   },
+  updateMemberIDTelesales: data => {
+    return http.post('/api/v3/tele23@member_edit', JSON.stringify(data))
+  },
   getMemberIDTelesales: MemberID => {
     return http.get(`/api/v3/tele23@member_id?memberid=${MemberID}`)
   },
