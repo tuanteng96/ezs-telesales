@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import React, { useEffect, useState } from 'react'
-import { Modal, OverlayTrigger, Popover } from 'react-bootstrap'
+import { Modal, Nav, OverlayTrigger, Popover, Tab } from 'react-bootstrap'
 import { createPortal } from 'react-dom'
 import Skeleton from 'react-loading-skeleton'
 import telesalesApi from 'src/api/telesales.api'
@@ -14,6 +14,7 @@ import Text from 'react-texty'
 import moment from 'moment'
 import 'moment/locale/vi'
 import { Formik, Form } from 'formik'
+import Select from 'react-select'
 
 moment.locale('vi')
 
@@ -156,12 +157,13 @@ function OverlayComponent({ btnLoading, onSubmit, item, Button, MemberID }) {
   )
 }
 
-function PickerReminder({ children, data, onRefresh }) {
+function PickerContract({ children, data, onRefresh }) {
   const MemberID = data.ID
   const [visible, setVisible] = useState()
   const [loading, setLoading] = useState(false)
   const [btnLoading, setBtnLoading] = useState(false)
   const [List, setList] = useState([])
+  const [activeKey, setActiveKey] = useState('list')
 
   const { teleAdv } = useSelector(({ auth }) => ({
     teleAdv: auth?.Info?.rightsSum?.teleAdv || false
@@ -314,7 +316,7 @@ function PickerReminder({ children, data, onRefresh }) {
             )}
           </>
         ) : (
-          <>Thêm lịch nhắc</>
+          <>Thêm mới hợp đồng</>
         )}
       </div>
 
@@ -330,7 +332,7 @@ function PickerReminder({ children, data, onRefresh }) {
             <Modal.Title>
               <div>
                 <div className="fw-600 font-size-lg text-uppercase">
-                  Lịch nhắc
+                  Hợp đồng
                 </div>
                 <div className="font-number font-size-base">
                   {data?.FullName} - {data.HandCardID} - {data?.MobilePhone}
@@ -338,97 +340,193 @@ function PickerReminder({ children, data, onRefresh }) {
               </div>
             </Modal.Title>
           </Modal.Header>
-          <div>
-            <Formik
-              initialValues={{
-                noti: {
-                  MemberID: MemberID,
-                  Date: '',
-                  Desc: '',
-                  IsNoti: false,
-                  ID: 0
-                }
-              }}
-              onSubmit={onSubmit}
-              validationSchema={AddNotiSchema}
-              enableReinitialize={true}
-            >
-              {formikProps => {
-                const {
-                  values,
-                  touched,
-                  errors,
-                  setFieldValue,
-                  handleBlur,
-                  handleChange
-                } = formikProps
-                return (
-                  <Form className="p-15px border-bottom">
-                    <div className="form-group mb-15px">
-                      <label>Ngày nhắc</label>
-                      <DatePicker
-                        name="noti.Date"
-                        onChange={date => {
-                          setFieldValue('noti.Date', date, false)
-                        }}
-                        selected={values.noti.Date}
-                        placeholderText="Chọn ngày"
-                        className={`form-control ${
-                          errors?.noti?.Date && touched?.noti?.Date
-                            ? 'is-invalid solid-invalid'
-                            : ''
-                        }`}
-                        dateFormat="dd/MM/yyyy"
-                        onBlur={handleBlur}
-                        autoComplete="off"
-                        //dateFormatCalendar="MMMM"
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Nội dung</label>
-                      <textarea
-                        name="noti.Desc"
-                        className={`form-control ${
-                          errors?.noti?.Desc && touched?.noti?.Desc
-                            ? 'is-invalid solid-invalid'
-                            : ''
-                        }`}
-                        rows="2"
-                        value={values?.noti?.Desc}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                      ></textarea>
-                    </div>
+          <Tab.Container activeKey={activeKey} onSelect={e => setActiveKey(e)}>
+            <Nav variant="pills" className="nav-contract">
+              <Nav.Item>
+                <Nav.Link eventKey="list">Danh sách</Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="add">Thêm mới</Nav.Link>
+              </Nav.Item>
+            </Nav>
+            <Tab.Content className="flex-grow-1 overflow-auto">
+              <Tab.Pane className="h-100" eventKey="list">
+                <div style={{ height: '1000px' }}></div>
+              </Tab.Pane>
+              <Tab.Pane className="h-100" eventKey="add">
+                <Formik
+                  initialValues={{
+                    noti: {
+                      MemberID: MemberID,
+                      Date: '',
+                      Desc: '',
+                      IsNoti: false,
+                      ID: 0
+                    }
+                  }}
+                  onSubmit={onSubmit}
+                  validationSchema={AddNotiSchema}
+                  enableReinitialize={true}
+                >
+                  {formikProps => {
+                    const {
+                      values,
+                      touched,
+                      errors,
+                      setFieldValue,
+                      handleBlur,
+                      handleChange
+                    } = formikProps
+                    return (
+                      <Form className="p-15px">
+                        <div
+                          className="mb-15px"
+                          style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(2,minmax(0,1fr))',
+                            gap: '1rem'
+                          }}
+                        >
+                          <div className="form-group mb-0">
+                            <label>Ngày</label>
+                            <DatePicker
+                              name="noti.Date"
+                              onChange={date => {
+                                setFieldValue('noti.Date', date, false)
+                              }}
+                              selected={values.noti.Date}
+                              placeholderText="Chọn ngày"
+                              className={`form-control ${
+                                errors?.noti?.Date && touched?.noti?.Date
+                                  ? 'is-invalid solid-invalid'
+                                  : ''
+                              }`}
+                              dateFormat="dd/MM/yyyy"
+                              onBlur={handleBlur}
+                              autoComplete="off"
+                              //dateFormatCalendar="MMMM"
+                            />
+                          </div>
+                          <div className="form-group mb-0">
+                            <label>Hạn dùng</label>
+                            <DatePicker
+                              name="noti.Date"
+                              onChange={date => {
+                                setFieldValue('noti.Date', date, false)
+                              }}
+                              selected={values.noti.Date}
+                              placeholderText="Chọn ngày"
+                              className={`form-control ${
+                                errors?.noti?.Date && touched?.noti?.Date
+                                  ? 'is-invalid solid-invalid'
+                                  : ''
+                              }`}
+                              dateFormat="dd/MM/yyyy"
+                              onBlur={handleBlur}
+                              autoComplete="off"
+                              //dateFormatCalendar="MMMM"
+                            />
+                          </div>
+                        </div>
 
-                    <div className="font-weight-bold d-flex align-items justify-content-between pt-15px">
-                      <div className="form-group">
-                        <label className="checkbox d-flex cursor-pointer mb-0">
-                          <input
-                            type="checkbox"
-                            name="noti.IsNoti"
+                        <div className="form-group mb-15px">
+                          <label>Nội dung</label>
+                          <textarea
+                            name="noti.Desc"
+                            className={`form-control ${
+                              errors?.noti?.Desc && touched?.noti?.Desc
+                                ? 'is-invalid solid-invalid'
+                                : ''
+                            }`}
+                            rows="2"
+                            value={values?.noti?.Desc}
                             onChange={handleChange}
                             onBlur={handleBlur}
-                            checked={values.noti.IsNoti}
+                          ></textarea>
+                        </div>
+                        <div className="form-group mb-15px">
+                          <label>Giá trị</label>
+                          <DatePicker
+                            name="noti.Date"
+                            onChange={date => {
+                              setFieldValue('noti.Date', date, false)
+                            }}
+                            selected={values.noti.Date}
+                            placeholderText="Chọn ngày"
+                            className={`form-control ${
+                              errors?.noti?.Date && touched?.noti?.Date
+                                ? 'is-invalid solid-invalid'
+                                : ''
+                            }`}
+                            dateFormat="dd/MM/yyyy"
+                            onBlur={handleBlur}
+                            autoComplete="off"
+                            //dateFormatCalendar="MMMM"
                           />
-                          <span className="checkbox-icon"></span>
-                          <span>Đã nhắc lịch</span>
-                        </label>
-                      </div>
-                      <button
-                        type="submit"
-                        className={clsx(
-                          'btn btn-success py-2 font-size-sm',
-                          btnLoading && 'spinner spinner-white spinner-right'
-                        )}
-                        disabled={btnLoading}
-                      >
-                        Thêm mới
-                      </button>
-                    </div>
-                  </Form>
-                )
-              }}
-            </Formik>
+                        </div>
+                        <div className="form-group mb-15px">
+                          <label>Ghi chú</label>
+                          <textarea
+                            name="noti.Desc"
+                            className={`form-control ${
+                              errors?.noti?.Desc && touched?.noti?.Desc
+                                ? 'is-invalid solid-invalid'
+                                : ''
+                            }`}
+                            rows="2"
+                            value={values?.noti?.Desc}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                          ></textarea>
+                        </div>
+                        <div className="form-group mb-15px">
+                          <label>Loại</label>
+                          <Select
+                            className="select-control"
+                            classNamePrefix="select"
+                            placeholder="Chọn loại"
+                            menuPosition="fixed"
+                            name="Type"
+                            //menuIsOpen={true}
+                            onChange={otp => {
+                              onSubmit(otp)
+                            }}
+                            value=""
+                            isClearable={true}
+                            options={[
+                              {
+                                label: 'Gia hạn',
+                                value: 'Gia hạn'
+                              },
+                              {
+                                label: 'Ký mới',
+                                value: 'Ký mới'
+                              }
+                            ]}
+                          />
+                        </div>
+                        <div>
+                          <button
+                            type="submit"
+                            className={clsx(
+                              'btn btn-success w-100',
+                              btnLoading &&
+                                'spinner spinner-white spinner-right'
+                            )}
+                            disabled={btnLoading}
+                          >
+                            Thêm mới
+                          </button>
+                        </div>
+                      </Form>
+                    )
+                  }}
+                </Formik>
+              </Tab.Pane>
+            </Tab.Content>
+          </Tab.Container>
+          {/* <div>
+            
           </div>
           <PerfectScrollbar
             options={perfectScrollbarOptions}
@@ -539,7 +637,7 @@ function PickerReminder({ children, data, onRefresh }) {
                 )}
               </>
             )}
-          </PerfectScrollbar>
+          </PerfectScrollbar> */}
         </Modal>,
         document.body
       )}
@@ -547,4 +645,4 @@ function PickerReminder({ children, data, onRefresh }) {
   )
 }
 
-export default PickerReminder
+export default PickerContract

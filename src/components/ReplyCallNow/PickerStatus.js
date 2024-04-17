@@ -1,11 +1,8 @@
-import clsx from 'clsx'
 import React, { useEffect, useState } from 'react'
 import { Modal } from 'react-bootstrap'
 import { createPortal } from 'react-dom'
-import telesalesApi from 'src/api/telesales.api'
 import { Formik, Form } from 'formik'
 import configApi from 'src/api/config.api'
-import { useSelector } from 'react-redux'
 
 import moment from 'moment'
 import 'moment/locale/vi'
@@ -23,9 +20,9 @@ function PickerStatus({ children, data, onChange }) {
   const [loadingType, setLoadingType] = useState(false)
   const [initialValues, setInitialValues] = useState(initialValue)
 
-  const { teleAdv } = useSelector(({ auth }) => ({
-    teleAdv: auth?.Info?.rightsSum?.teleAdv || false
-  }))
+  // const { teleAdv } = useSelector(({ auth }) => ({
+  //   teleAdv: auth?.Info?.rightsSum?.teleAdv || false
+  // }))
 
   useEffect(() => {
     let ListTypeTags = []

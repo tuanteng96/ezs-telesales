@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom'
 import telesalesApi from 'src/api/telesales.api'
 import { Formik, Form } from 'formik'
 import configApi from 'src/api/config.api'
-import { useSelector } from 'react-redux'
+// import { useSelector } from 'react-redux'
 
 import moment from 'moment'
 import 'moment/locale/vi'
@@ -27,9 +27,9 @@ function PickerStatus({ children, data, onRefresh }) {
   const [initialValues, setInitialValues] = useState(initialValue)
   const [Status, setStatus] = useState('')
 
-  const { teleAdv } = useSelector(({ auth }) => ({
-    teleAdv: auth?.Info?.rightsSum?.teleAdv || false
-  }))
+  // const { teleAdv } = useSelector(({ auth }) => ({
+  //   teleAdv: auth?.Info?.rightsSum?.teleAdv || false
+  // }))
 
   useEffect(() => {
     setStatus(data?.TeleTags)
@@ -63,7 +63,11 @@ function PickerStatus({ children, data, onRefresh }) {
       }
     }
 
-    let TeleTagsArr = Status ? Status.split(',') : data?.TeleTags ? data?.TeleTags.split(',') : []
+    let TeleTagsArr = Status
+      ? Status.split(',')
+      : data?.TeleTags
+      ? data?.TeleTags.split(',')
+      : []
     let newTeleTags = ''
     let newTeleTagsKH = ''
     let newTeleStar = ''
@@ -86,6 +90,7 @@ function PickerStatus({ children, data, onRefresh }) {
       TeleTagsKH: newTeleTagsKH,
       TeleStar: newTeleStar
     }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, ListType])
 
   useEffect(() => {
@@ -174,8 +179,7 @@ function PickerStatus({ children, data, onRefresh }) {
             enableReinitialize={true}
           >
             {formikProps => {
-              const { values, handleBlur, handleChange, setFieldValue } =
-                formikProps
+              const { values, handleBlur, setFieldValue } = formikProps
               return (
                 <Form className="h-100 d-flex flex-column">
                   <Modal.Header closeButton>

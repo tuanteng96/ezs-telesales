@@ -6,16 +6,10 @@ import Sidebar from '../../components/Sidebar'
 import telesalesApi from 'src/api/telesales.api'
 import Navbar from 'src/components/Navbar/Navbar'
 import uniqid from 'uniqid'
-import { OverlayTrigger, Popover } from 'react-bootstrap'
-import { Form, Formik } from 'formik'
-import SelectTeleHis from 'src/components/Selects/SelectTeleHis'
-import clsx from 'clsx'
-import * as Yup from 'yup'
 
 import moment from 'moment'
 import 'moment/locale/vi'
-import { Link, useLocation } from 'react-router-dom'
-import { useWindowSize } from 'src/hooks/useWindowSize'
+import { useLocation } from 'react-router-dom'
 
 moment.locale('vi')
 
@@ -59,115 +53,115 @@ function checkGG(fn) {
   }
 }
 
-const AddNotiSchema = Yup.object().shape({
-  Content: Yup.string().required('Nhập ghi chú')
-})
+// const AddNotiSchema = Yup.object().shape({
+//   Content: Yup.string().required('Nhập ghi chú')
+// })
 
-function OverlayComponent({ btnLoading, onSubmit, item, Button }) {
-  const [initialValues, setInitialValues] = useState({
-    Content: '',
-    Result: ''
-  })
+// function OverlayComponent({ btnLoading, onSubmit, item, Button }) {
+//   const [initialValues, setInitialValues] = useState({
+//     Content: '',
+//     Result: ''
+//   })
 
-  useEffect(() => {
-    if (item) {
-      const { notifications } = item
-      setInitialValues(prevState => ({
-        ...prevState,
-        noti: {
-          MemberID: notifications.MemberID,
-          Date: moment(notifications.Date).format('MM/DD/YYYY'),
-          CreateDate: moment(notifications.CreateDate).format('MM/DD/YYYY'),
-          Desc: notifications.Desc,
-          IsNoti: true,
-          ID: notifications.ID
-        }
-      }))
-    }
-  }, [item])
+//   useEffect(() => {
+//     if (item) {
+//       const { notifications } = item
+//       setInitialValues(prevState => ({
+//         ...prevState,
+//         noti: {
+//           MemberID: notifications.MemberID,
+//           Date: moment(notifications.Date).format('MM/DD/YYYY'),
+//           CreateDate: moment(notifications.CreateDate).format('MM/DD/YYYY'),
+//           Desc: notifications.Desc,
+//           IsNoti: true,
+//           ID: notifications.ID
+//         }
+//       }))
+//     }
+//   }, [item])
 
-  return (
-    <OverlayTrigger
-      rootClose
-      trigger="click"
-      key="top"
-      placement="auto"
-      overlay={
-        <Popover id={`popover-positioned-top`} className="popover-lg">
-          <Formik
-            initialValues={initialValues}
-            onSubmit={onSubmit}
-            validationSchema={AddNotiSchema}
-            enableReinitialize={true}
-          >
-            {formikProps => {
-              const {
-                values,
-                touched,
-                errors,
-                setFieldValue,
-                handleBlur,
-                handleChange
-              } = formikProps
-              return (
-                <Form>
-                  <Popover.Header className="font-weight-bold text-uppercase d-flex justify-content-between py-3">
-                    Thực hiện lịch nhắc
-                  </Popover.Header>
-                  <Popover.Body>
-                    <div className="form-group mb-15px">
-                      <label>Kết quả</label>
-                      <SelectTeleHis
-                        isLoading={false}
-                        className="w-100 flex-1"
-                        placeholder="Chọn kết quả"
-                        name="Result"
-                        onChange={otp => {
-                          setFieldValue('Result', otp, false)
-                        }}
-                        value={values.Result}
-                        isClearable={true}
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Ghi chú</label>
-                      <textarea
-                        name="Content"
-                        className={`form-control ${
-                          errors?.Content && touched?.Content
-                            ? 'is-invalid solid-invalid'
-                            : ''
-                        }`}
-                        rows="5"
-                        value={values.Content}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                      ></textarea>
-                    </div>
-                  </Popover.Body>
-                  <div className="font-weight-bold d-flex justify-content-between py-10px px-3 border-top">
-                    <button
-                      type="submit"
-                      className={clsx(
-                        'btn btn-success py-2 font-size-sm',
-                        btnLoading && 'spinner spinner-white spinner-right'
-                      )}
-                      disabled={btnLoading}
-                    >
-                      {!item ? 'Thêm mới' : 'Cập nhập'}
-                    </button>
-                  </div>
-                </Form>
-              )
-            }}
-          </Formik>
-        </Popover>
-      }
-    >
-      {Button()}
-    </OverlayTrigger>
-  )
-}
+//   return (
+//     <OverlayTrigger
+//       rootClose
+//       trigger="click"
+//       key="top"
+//       placement="auto"
+//       overlay={
+//         <Popover id={`popover-positioned-top`} className="popover-lg">
+//           <Formik
+//             initialValues={initialValues}
+//             onSubmit={onSubmit}
+//             validationSchema={AddNotiSchema}
+//             enableReinitialize={true}
+//           >
+//             {formikProps => {
+//               const {
+//                 values,
+//                 touched,
+//                 errors,
+//                 setFieldValue,
+//                 handleBlur,
+//                 handleChange
+//               } = formikProps
+//               return (
+//                 <Form>
+//                   <Popover.Header className="font-weight-bold text-uppercase d-flex justify-content-between py-3">
+//                     Thực hiện lịch nhắc
+//                   </Popover.Header>
+//                   <Popover.Body>
+//                     <div className="form-group mb-15px">
+//                       <label>Kết quả</label>
+//                       <SelectTeleHis
+//                         isLoading={false}
+//                         className="w-100 flex-1"
+//                         placeholder="Chọn kết quả"
+//                         name="Result"
+//                         onChange={otp => {
+//                           setFieldValue('Result', otp, false)
+//                         }}
+//                         value={values.Result}
+//                         isClearable={true}
+//                       />
+//                     </div>
+//                     <div className="form-group">
+//                       <label>Ghi chú</label>
+//                       <textarea
+//                         name="Content"
+//                         className={`form-control ${
+//                           errors?.Content && touched?.Content
+//                             ? 'is-invalid solid-invalid'
+//                             : ''
+//                         }`}
+//                         rows="5"
+//                         value={values.Content}
+//                         onChange={handleChange}
+//                         onBlur={handleBlur}
+//                       ></textarea>
+//                     </div>
+//                   </Popover.Body>
+//                   <div className="font-weight-bold d-flex justify-content-between py-10px px-3 border-top">
+//                     <button
+//                       type="submit"
+//                       className={clsx(
+//                         'btn btn-success py-2 font-size-sm',
+//                         btnLoading && 'spinner spinner-white spinner-right'
+//                       )}
+//                       disabled={btnLoading}
+//                     >
+//                       {!item ? 'Thêm mới' : 'Cập nhập'}
+//                     </button>
+//                   </div>
+//                 </Form>
+//               )
+//             }}
+//           </Formik>
+//         </Popover>
+//       }
+//     >
+//       {Button()}
+//     </OverlayTrigger>
+//   )
+// }
 
 function ReminderList(props) {
   const { CrStockID, teleAdv, User } = useSelector(({ auth }) => ({
@@ -184,7 +178,6 @@ function ReminderList(props) {
   const [loading, setLoading] = useState(false)
   const [PageCount, setPageCount] = useState(0)
   const [PageTotal, setPageTotal] = useState(0)
-  const [btnLoading, setBtnLoading] = useState(false)
   const [IsLoadingEx, setIsLoadingEx] = useState(false)
   const [filters, setFilters] = useState(
     state?.filters
@@ -210,7 +203,7 @@ function ReminderList(props) {
   )
 
   const { onOpenSidebar } = useContext(ReminderContext)
-  const { width } = useWindowSize()
+  // const { width } = useWindowSize()
 
   useEffect(() => {
     getListReminder()
@@ -350,8 +343,6 @@ function ReminderList(props) {
   )
 
   const onSubmit = async values => {
-    setBtnLoading(true)
-
     const newNoti = {
       noti: {
         MemberID: values?.DetailNoti?.MemberID,

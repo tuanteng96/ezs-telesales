@@ -18,77 +18,95 @@ import Reminder from 'src/features/Reminder'
 import ReminderList from 'src/features/Reminder/pages/ReminderList'
 import ReplyCallNow from 'src/components/ReplyCallNow/ReplyCallNow'
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false
+    }
+  }
+})
+
 function App({ store, persistor }) {
   return (
     <Provider store={store}>
-      <AuthInit>
-        <ScrollToTop>
-          <Routes>
-            <Route path="/">
-              <Route index element={<Navigate to="/danh-sach" replace />} />
-            </Route>
-            <Route
-              path="/danh-sach"
-              element={
-                <UnauthenticateGuard>
-                  <Telesales />
-                </UnauthenticateGuard>
-              }
-            >
-              <Route index element={<TelesalesList />} />
-              <Route path=":MemberID" element={<TelesalesDetail />}>
-                <Route index element={<Navigate to="dich-vu" replace />} />
-                <Route path="dich-vu" element={<TelesalesOptionServices />} />
-                <Route path="san-pham" element={<TelesalesOptionProducts />} />
-                <Route
-                  path="lich-su-mua-hang"
-                  element={<TelesalesOptionBuying />}
-                />
-                <Route
-                  path="lich-su-du-dung-dv"
-                  element={<TelesalesOptionUse />}
-                />
-                <Route path="*" element={<Navigate to="/dich-vu" replace />} />
+      <QueryClientProvider client={queryClient}>
+        <AuthInit>
+          <ScrollToTop>
+            <Routes>
+              <Route path="/">
+                <Route index element={<Navigate to="/danh-sach" replace />} />
               </Route>
-            </Route>
-            <Route
-              path="/thong-ke"
-              element={
-                <UnauthenticateGuard>
-                  <Statistical />
-                </UnauthenticateGuard>
-              }
-            >
-              <Route index element={<Navigate to="danh-sach" replace />} />
-              <Route path="danh-sach" element={<StatisticalList />} />
-            </Route>
-            <Route
-              path="/lich-nhac"
-              element={
-                <UnauthenticateGuard>
-                  <Reminder />
-                </UnauthenticateGuard>
-              }
-            >
-              <Route index element={<Navigate to="danh-sach" replace />} />
-              <Route path="danh-sach" element={<ReminderList />} />
-            </Route>
-            <Route
-              path="/yeu-cau-quyen-truy-cap"
-              element={
-                <AuthenticateGuard>
-                  <Authentication />
-                </AuthenticateGuard>
-              }
-            />
-            <Route
-              path="/Admin/telesales/index.html"
-              element={<Navigate to="/" replace />}
-            />
-          </Routes>
-          <ReplyCallNow />
-        </ScrollToTop>
-      </AuthInit>
+              <Route
+                path="/danh-sach"
+                element={
+                  <UnauthenticateGuard>
+                    <Telesales />
+                  </UnauthenticateGuard>
+                }
+              >
+                <Route index element={<TelesalesList />} />
+                <Route path=":MemberID" element={<TelesalesDetail />}>
+                  <Route index element={<Navigate to="dich-vu" replace />} />
+                  <Route path="dich-vu" element={<TelesalesOptionServices />} />
+                  <Route
+                    path="san-pham"
+                    element={<TelesalesOptionProducts />}
+                  />
+                  <Route
+                    path="lich-su-mua-hang"
+                    element={<TelesalesOptionBuying />}
+                  />
+                  <Route
+                    path="lich-su-du-dung-dv"
+                    element={<TelesalesOptionUse />}
+                  />
+                  <Route
+                    path="*"
+                    element={<Navigate to="/dich-vu" replace />}
+                  />
+                </Route>
+              </Route>
+              <Route
+                path="/thong-ke"
+                element={
+                  <UnauthenticateGuard>
+                    <Statistical />
+                  </UnauthenticateGuard>
+                }
+              >
+                <Route index element={<Navigate to="danh-sach" replace />} />
+                <Route path="danh-sach" element={<StatisticalList />} />
+              </Route>
+              <Route
+                path="/lich-nhac"
+                element={
+                  <UnauthenticateGuard>
+                    <Reminder />
+                  </UnauthenticateGuard>
+                }
+              >
+                <Route index element={<Navigate to="danh-sach" replace />} />
+                <Route path="danh-sach" element={<ReminderList />} />
+              </Route>
+              <Route
+                path="/yeu-cau-quyen-truy-cap"
+                element={
+                  <AuthenticateGuard>
+                    <Authentication />
+                  </AuthenticateGuard>
+                }
+              />
+              <Route
+                path="/Admin/telesales/index.html"
+                element={<Navigate to="/" replace />}
+              />
+            </Routes>
+            <ReplyCallNow />
+          </ScrollToTop>
+        </AuthInit>
+      </QueryClientProvider>
     </Provider>
   )
 }

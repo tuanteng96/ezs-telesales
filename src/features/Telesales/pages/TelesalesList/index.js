@@ -18,6 +18,11 @@ import { setFiltersTeles } from '../../TelesalesSlice'
 import PickerHistory from './components/PickerHistory'
 import PickerReminder from './components/PickerReminder'
 import PickerStatus from './components/PickerStatus'
+import { useMutation } from '@tanstack/react-query'
+import moreApi from 'src/api/more.api'
+import { AssetsHelpers } from 'src/helpers/AssetsHelpers'
+import Swal from 'sweetalert2'
+import PickerContract from './components/PickerContract'
 
 moment.locale('vi')
 
@@ -789,6 +794,119 @@ const EditableCellSoftLink = ({
   )
 }
 
+const EditableCellPDF = ({ rowData, container, showEditing, hideEditing }) => {
+  const [value, setValue] = useState(rowData?.ContractDefault)
+  const fileInputRef = useRef()
+
+  useEffect(() => {
+    setValue(rowData?.ContractDefault)
+  }, [rowData?.ContractDefault])
+
+  const uploadMutation = useMutation({
+    mutationFn: async body => {
+      let { data } = await moreApi.uploadFile(body)
+      const newData = {
+        arr: [
+          {
+            ID: rowData.ID,
+            ContractDefault: data?.data || ''
+          }
+        ]
+      }
+      await telesalesApi.updateMemberIDTelesales(newData)
+      return data
+    }
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: body => telesalesApi.updateMemberIDTelesales(body)
+  })
+
+  const handleChange = event => {
+    const files = event.target.files
+    var bodyFormData = new FormData()
+    bodyFormData.append('file', files[0])
+    uploadMutation.mutate(bodyFormData, {
+      onSuccess: data => {
+        setValue(data.data)
+      }
+    })
+  }
+
+  const onDelete = () => {
+    Swal.fire({
+      title: 'Thực hiện xóa ?',
+      html: `Bạn đang thực hiện xóa File hợp đồng này.`,
+      showCancelButton: true,
+      confirmButtonText: 'Xóa ngay',
+      cancelButtonText: 'Hủy',
+      showLoaderOnConfirm: true,
+      customClass: {
+        confirmButton: 'bg-danger'
+      },
+      preConfirm: () =>
+        new Promise((resolve, reject) => {
+          deleteMutation.mutate(
+            {
+              arr: [
+                {
+                  ID: rowData.ID,
+                  ContractDefault: ''
+                }
+              ]
+            },
+            {
+              onSuccess: () => {
+                setValue('')
+                resolve()
+              }
+            }
+          )
+        }),
+      allowOutsideClick: () => !Swal.isLoading()
+    })
+  }
+
+  return (
+    <div className="w-full">
+      {value && (
+        <div className="mb-2">
+          <a
+            href={AssetsHelpers.toUrlServer(`/upload/image/${value}`)}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Xem hợp đồng
+          </a>
+          <span
+            className="text-danger ml-15px cursor-pointer"
+            onClick={onDelete}
+          >
+            [Xoá]
+          </span>
+        </div>
+      )}
+      <button
+        type="button"
+        className="btn btn-out btn-default"
+        onClick={() => fileInputRef.current.click()}
+        disabled={uploadMutation.isPending}
+      >
+        {uploadMutation.isPending ? 'Đang upload ...' : 'Upload File'}
+      </button>
+      <input
+        title="Upload File"
+        value=""
+        onChange={handleChange}
+        multiple={false}
+        ref={fileInputRef}
+        type="file"
+        hidden
+      />
+    </div>
+  )
+}
+
 const columnsSort = window?.top?.GlobalConfig?.Admin?.kpiSortColumn || null
 
 function TelesalesList(props) {
@@ -802,7 +920,6 @@ function TelesalesList(props) {
   )
   const [ListTelesales, setListTelesales] = useState([])
   const [loading, setLoading] = useState(false)
-  const [loadingCall, setLoadingCall] = useState('')
   const [PageCount, setPageCount] = useState(0)
   const [PageTotal, setPageTotal] = useState(0)
   const [IsEditing, setIsEditing] = useState(false)
@@ -815,6 +932,8 @@ function TelesalesList(props) {
   const [filters, setFilters] = useState({
     withsNoti: true,
     filter: {
+      UserID: '',
+      UserSupportID: '',
       tele_process: filtersRedux.tele_process || '', //Đang tiếp cận,Đặt lịch thành công
       tele_user_id: filtersRedux.tele_user_id
         ? filtersRedux.tele_user_id
@@ -1118,6 +1237,63 @@ function TelesalesList(props) {
           )
         },
         {
+          key: 'ContractDefault',
+          title: 'PDF hợp đồng',
+          dataKey: 'ContractDefault',
+          width: 220,
+          sortable: false,
+          cellRenderer: ({ rowData, container }) => (
+            <EditableCellPDF
+              rowData={rowData}
+              container={container}
+              hideEditing={() => setIsEditing(false)}
+              showEditing={() => setIsEditing(true)}
+            />
+          )
+        },
+        {
+          key: 'ContractJSON',
+          title: 'Hợp đồng',
+          dataKey: 'ContractJSON',
+          width: 250,
+          sortable: false,
+          cellRenderer: ({ rowData, container }) => (
+            <PickerContract data={rowData} onRefresh={onRefresh}>
+              {/* {({ open }) => (
+                <div onClick={open}>
+                  <div>
+                    {rowData.NotiList && rowData.NotiList.length > 0 ? (
+                      <>
+                        <div className="mt-8px fw-500">
+                          Ngày nhắc
+                          <span className="pl-5px">
+                            {moment(rowData.NotiList[0].Date).format(
+                              'DD-MM-YYYY'
+                            )}
+                          </span>
+                          {rowData.NotiList[0].IsNoti && (
+                            <span className="pl-5px font-size-xs text-success">
+                              - Đã nhắc
+                            </span>
+                          )}
+                        </div>
+                        <Text style={{ width: '230px' }} tooltipMaxWidth={250}>
+                          Nội dung :
+                          <span className="fw-500 pl-3px">
+                            {rowData.NotiList[0].Desc}
+                          </span>
+                        </Text>
+                      </>
+                    ) : (
+                      'Thêm lịch nhắc'
+                    )}
+                  </div>
+                </div>
+              )} */}
+            </PickerContract>
+          )
+        },
+        {
           key: 'TeleNote',
           title: 'Ghi chú',
           dataKey: 'TeleNote',
@@ -1315,7 +1491,7 @@ function TelesalesList(props) {
       return newColumns
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [width, ListTelesales, loadingCall]
+    [width, ListTelesales]
   )
 
   const handleEndReached = () => {

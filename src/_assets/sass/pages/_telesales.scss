@@ -164,6 +164,19 @@
     }
 }
 
+.nav-contract {
+    background: #ebedf3;
+    .nav-item {
+        width: 50%;
+        .nav-link {
+            border-radius: 0;
+            text-align: center;
+            cursor: pointer;
+            padding: 0.7rem 1rem;
+        }
+    }
+}
+
 .bell {
     -webkit-animation: ring 2s .7s ease-in-out infinite;
     -webkit-transform-origin: 50% 4px;
