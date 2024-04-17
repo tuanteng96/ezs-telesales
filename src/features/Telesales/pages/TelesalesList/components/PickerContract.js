@@ -1,13 +1,10 @@
 import clsx from 'clsx'
 import React, { useEffect, useState } from 'react'
-import { Modal, Nav, OverlayTrigger, Popover, Tab } from 'react-bootstrap'
+import { Modal, Nav, Tab } from 'react-bootstrap'
 import { createPortal } from 'react-dom'
-import Skeleton from 'react-loading-skeleton'
 import telesalesApi from 'src/api/telesales.api'
 import { AssetsHelpers } from 'src/helpers/AssetsHelpers'
-import PerfectScrollbar from 'react-perfect-scrollbar'
 import Swal from 'sweetalert2'
-import { useSelector } from 'react-redux'
 import * as Yup from 'yup'
 import DatePicker from 'react-datepicker'
 import Text from 'react-texty'
@@ -15,229 +12,88 @@ import moment from 'moment'
 import 'moment/locale/vi'
 import { Formik, Form } from 'formik'
 import Select from 'react-select'
+import { NumericFormat } from 'react-number-format'
+import { useMutation } from '@tanstack/react-query'
+import { PriceHelper } from 'src/helpers/PriceHelper'
+import { useSelector } from 'react-redux'
 
 moment.locale('vi')
 
-const perfectScrollbarOptions = {
-  wheelSpeed: 2,
-  wheelPropagation: false
-}
-
 const AddNotiSchema = Yup.object().shape({
-  noti: Yup.object().shape({
-    Desc: Yup.string().required('Nhập ghi chú'),
-    Date: Yup.string().required('Nhập ngày')
-  })
+  CreateDate: Yup.string().required('Ngày tạo trống'),
+  EndDate: Yup.string().required('Ngày hết hạn trống')
 })
 
-function OverlayComponent({ btnLoading, onSubmit, item, Button, MemberID }) {
-  const [initialValues, setInitialValues] = useState({
-    noti: {
-      MemberID: MemberID,
-      Date: '',
-      Desc: '',
-      IsNoti: false,
-      ID: 0
-    }
-  })
-
-  useEffect(() => {
-    if (item && item.ID) {
-      setInitialValues(prevState => ({
-        noti: {
-          ...prevState.noti,
-          Date: item.Date ? new Date(item.Date) : '',
-          Desc: item.Desc,
-          ID: item.ID,
-          IsNoti: item.IsNoti,
-          CreateDate: item.CreateDate ? new Date(item.CreateDate) : ''
-        }
-      }))
-    }
-  }, [item])
-
-  return (
-    <OverlayTrigger
-      rootClose
-      trigger="click"
-      key="top"
-      placement="auto"
-      overlay={
-        <Popover id={`popover-positioned-top`} className="popover-lg">
-          <Formik
-            initialValues={initialValues}
-            onSubmit={onSubmit}
-            validationSchema={AddNotiSchema}
-            enableReinitialize={true}
-          >
-            {formikProps => {
-              const {
-                values,
-                touched,
-                errors,
-                setFieldValue,
-                handleBlur,
-                handleChange
-              } = formikProps
-              return (
-                <Form>
-                  <Popover.Header className="font-weight-bold text-uppercase d-flex justify-content-between py-3">
-                    {!item ? 'Thêm mới' : 'Cập nhập'} lịch nhắc
-                  </Popover.Header>
-                  <Popover.Body>
-                    <div className="form-group mb-15px">
-                      <label>Ngày nhắc</label>
-                      <DatePicker
-                        name="noti.Date"
-                        onChange={date => {
-                          setFieldValue('noti.Date', date, false)
-                        }}
-                        selected={values.noti.Date}
-                        placeholderText="Chọn ngày"
-                        className={`form-control ${
-                          errors?.noti?.Date && touched?.noti?.Date
-                            ? 'is-invalid solid-invalid'
-                            : ''
-                        }`}
-                        dateFormat="dd/MM/yyyy"
-                        onBlur={handleBlur}
-                        //dateFormatCalendar="MMMM"
-                      />
-                    </div>
-                    <div className="form-group mb-15px">
-                      <label>Nội dung</label>
-                      <textarea
-                        name="noti.Desc"
-                        className={`form-control ${
-                          errors?.noti?.Desc && touched?.noti?.Desc
-                            ? 'is-invalid solid-invalid'
-                            : ''
-                        }`}
-                        rows="5"
-                        value={values?.noti?.Desc}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                      ></textarea>
-                    </div>
-                    <div className="form-group">
-                      <label className="checkbox d-flex cursor-pointer">
-                        <input
-                          type="checkbox"
-                          name="noti.IsNoti"
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          checked={values.noti.IsNoti}
-                        />
-                        <span className="checkbox-icon"></span>
-                        <span>Đã nhắc lịch</span>
-                      </label>
-                    </div>
-                  </Popover.Body>
-                  <div className="font-weight-bold d-flex justify-content-between py-10px px-3 border-top">
-                    <button
-                      type="submit"
-                      className={clsx(
-                        'btn btn-success py-2 font-size-sm',
-                        btnLoading && 'spinner spinner-white spinner-right'
-                      )}
-                      disabled={btnLoading}
-                    >
-                      {!item ? 'Thêm mới' : 'Cập nhập'}
-                    </button>
-                  </div>
-                </Form>
-              )
-            }}
-          </Formik>
-        </Popover>
-      }
-    >
-      {Button()}
-    </OverlayTrigger>
-  )
-}
-
-function PickerContract({ children, data, onRefresh }) {
-  const MemberID = data.ID
+function PickerContract({ children, rowData, onRefresh }) {
   const [visible, setVisible] = useState()
-  const [loading, setLoading] = useState(false)
-  const [btnLoading, setBtnLoading] = useState(false)
-  const [List, setList] = useState([])
+  const [List, setList] = useState(
+    rowData?.ContractJSON ? JSON.parse(rowData?.ContractJSON) : []
+  )
+
   const [activeKey, setActiveKey] = useState('list')
 
   const { teleAdv } = useSelector(({ auth }) => ({
-    teleAdv: auth?.Info?.rightsSum?.teleAdv || false
+    teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false
   }))
 
   useEffect(() => {
-    if (MemberID && visible) {
-      getNotiList()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [MemberID, visible])
+    setList(rowData?.ContractJSON ? JSON.parse(rowData?.ContractJSON) : [])
+  }, [rowData])
 
-  const getNotiList = (isLoading = true, callback) => {
-    isLoading && setLoading(true)
-    const filters = {
-      MemberID: MemberID
+  const updateMutation = useMutation({
+    mutationFn: async body => {
+      const newData = {
+        arr: [
+          {
+            ID: rowData.ID,
+            ContractJSON: body?.ContractJSON
+              ? JSON.stringify(body.ContractJSON)
+              : ''
+          }
+        ]
+      }
+      let { data } = await telesalesApi.updateMemberIDTelesales(newData)
+
+      return data
     }
-    telesalesApi
-      .getNotiMember(filters)
-      .then(({ data }) => {
-        setList(data.list)
-        setLoading(false)
-        callback && callback()
-      })
-      .catch(error => console.log(error))
-  }
+  })
 
   const onSubmit = (values, { resetForm }) => {
-    setBtnLoading(true)
-    const newData = {
-      noti: {
-        MemberID: values.noti.MemberID,
-        Date: moment(values.noti.Date).format('MM/DD/YYYY'),
-        Desc: values.noti.Desc,
-        IsNoti: values.noti.IsNoti,
-        ID: values.noti?.ID || 0
+    let newObject = {
+      ...values,
+      CreateDate: values?.CreateDate
+        ? moment(values?.CreateDate).format('HH:mm YYYY-MM-DD')
+        : '',
+      EndDate: values?.EndDate
+        ? moment(values?.EndDate).format('HH:mm YYYY-MM-DD')
+        : '',
+      Type: values?.Type?.value || ''
+    }
+    let newLists = [newObject, ...List]
+    updateMutation.mutate(
+      {
+        ContractJSON: newLists
+      },
+      {
+        onSuccess: ({ lst }) => {
+          onRefresh()
+          if (lst && lst.length > 0) {
+            const ListsNews = lst[0].ContractJSON
+              ? JSON.parse(lst[0].ContractJSON)
+              : []
+            setList(ListsNews)
+            resetForm()
+            setActiveKey('list')
+          }
+        }
       }
-    }
-    if (values.noti.CreateDate) {
-      newData.noti.CreateDate = moment(values.noti.CreateDate).format(
-        'MM/DD/YYYY'
-      )
-    }
-    telesalesApi
-      .addNotiMember(newData)
-      .then(response => {
-        getNotiList(false, () => {
-          resetForm()
-          setBtnLoading(false)
-          setLoading(false)
-          window.top?.toastr &&
-            window.top?.toastr.success(
-              values.noti?.ID > 0
-                ? 'Cập nhập lịch nhắc thành công'
-                : 'Thêm mới lịch nhắc thành công',
-              '',
-              {
-                timeOut: 1500
-              }
-            )
-          window.getListReminder && window.getListReminder()
-          document.body.click()
-        })
-      })
-      .catch(error => console.log(error))
+    )
   }
 
-  const onDelete = item => {
-    const newData = {
-      deleteIds: [item.ID]
-    }
+  const onDelete = index => {
     Swal.fire({
       title: 'Thực hiện xóa ?',
-      html: `Bạn đang thực hiện xóa lịch nhắc này không.`,
+      html: `Bạn đang thực hiện xóa hợp đồng này.`,
       showCancelButton: true,
       confirmButtonText: 'Xóa ngay',
       cancelButtonText: 'Hủy',
@@ -247,26 +103,25 @@ function PickerContract({ children, data, onRefresh }) {
       },
       preConfirm: () =>
         new Promise((resolve, reject) => {
-          telesalesApi
-            .deleteNotiMember(newData)
-            .then(response => {
-              getNotiList(false, () => {
-                window.getListReminder && window.getListReminder()
-                // onRefresh(() => {
-                //   window.top?.toastr &&
-                //     window.top?.toastr.success('Xóa lịch nhắc thành công', '', {
-                //       timeOut: 1500
-                //     })
-                //   resolve()
-                // })
-                window.top?.toastr &&
-                  window.top?.toastr.success('Xóa lịch nhắc thành công', '', {
-                    timeOut: 1500
-                  })
-                resolve()
-              })
-            })
-            .catch(error => console.log(error))
+          let newLists = [...List]
+          newLists.splice(index, 1)
+          updateMutation.mutate(
+            {
+              ContractJSON: newLists
+            },
+            {
+              onSuccess: ({ lst }) => {
+                onRefresh()
+                if (lst && lst.length > 0) {
+                  const ListsNews = lst[0].ContractJSON
+                    ? JSON.parse(lst[0].ContractJSON)
+                    : []
+                  setList(ListsNews)
+                  resolve()
+                }
+              }
+            }
+          )
         }),
       allowOutsideClick: () => !Swal.isLoading()
     })
@@ -274,49 +129,21 @@ function PickerContract({ children, data, onRefresh }) {
 
   return (
     <>
-      <div onClick={() => setVisible(true)}>
-        {List.length > 0 || (data.NotiList && data.NotiList.length > 0) ? (
+      <div className="cursor-pointer" onClick={() => setVisible(true)}>
+        {List && List.length > 0 ? (
           <>
-            {List.length > 0 ? (
-              <>
-                <div className="mt-8px fw-500">
-                  Ngày nhắc
-                  <span className="pl-5px">
-                    {moment(List[0].Date).format('DD-MM-YYYY')}
-                  </span>
-                  {List[0].IsNoti && (
-                    <span className="pl-5px font-size-xs text-success">
-                      - Đã nhắc
-                    </span>
-                  )}
-                </div>
-                <Text style={{ width: '230px' }} tooltipMaxWidth={250}>
-                  Nội dung :
-                  <span className="fw-500 pl-3px">{List[0].Desc}</span>
-                </Text>
-              </>
-            ) : (
-              <>
-                <div className="mt-8px fw-500">
-                  Ngày nhắc
-                  <span className="pl-5px">
-                    {moment(data.NotiList[0].Date).format('DD-MM-YYYY')}
-                  </span>
-                  {data.NotiList[0].IsNoti && (
-                    <span className="pl-5px font-size-xs text-success">
-                      - Đã nhắc
-                    </span>
-                  )}
-                </div>
-                <Text style={{ width: '230px' }} tooltipMaxWidth={250}>
-                  Nội dung :
-                  <span className="fw-500 pl-3px">{data.NotiList[0].Desc}</span>
-                </Text>
-              </>
-            )}
+            <div className="mt-8px fw-500">
+              Hạn sử dụng
+              <span className="pl-5px text-danger">
+                {moment(List[0].EndDate).format('DD-MM-YYYY')}
+              </span>
+            </div>
+            <Text style={{ width: '230px' }} tooltipMaxWidth={250}>
+              Nội dung :<span className="fw-500 pl-3px">{List[0].Content}</span>
+            </Text>
           </>
         ) : (
-          <>Thêm mới hợp đồng</>
+          <div className="text-muted2">Thêm mới hợp đồng</div>
         )}
       </div>
 
@@ -335,7 +162,8 @@ function PickerContract({ children, data, onRefresh }) {
                   Hợp đồng
                 </div>
                 <div className="font-number font-size-base">
-                  {data?.FullName} - {data.HandCardID} - {data?.MobilePhone}
+                  {rowData?.FullName} - {rowData.HandCardID} -{' '}
+                  {rowData?.MobilePhone}
                 </div>
               </div>
             </Modal.Title>
@@ -351,17 +179,95 @@ function PickerContract({ children, data, onRefresh }) {
             </Nav>
             <Tab.Content className="flex-grow-1 overflow-auto">
               <Tab.Pane className="h-100" eventKey="list">
-                <div style={{ height: '1000px' }}></div>
+                {List && List.length > 0 && (
+                  <div>
+                    {List.map((item, index) => (
+                      <div
+                        className="p-15px border-bottom position-relative"
+                        key={index}
+                      >
+                        {teleAdv && (
+                          <div
+                            className="text-danger shadow position-absolute bg-white right-20px top-20px w-40px h-40px d-flex justify-content-center align-items-center rounded-circle cursor-pointer"
+                            onClick={() => onDelete(index)}
+                          >
+                            <i className="far fa-trash-alt"></i>
+                          </div>
+                        )}
+
+                        <div>
+                          Ngày tạo :
+                          <span className="pl-5px fw-600">
+                            {moment(item.CreateDate, 'HH:mm YYYY-MM-DD').format(
+                              'DD-MM-YYYY'
+                            )}
+                          </span>
+                        </div>
+                        <div>
+                          Hạn sử dụng :
+                          <span className="pl-5px fw-600 text-danger">
+                            {moment(item.EndDate, 'HH:mm YYYY-MM-DD').format(
+                              'DD-MM-YYYY'
+                            )}
+                          </span>
+                        </div>
+                        <div>
+                          Loại :
+                          <span className="pl-5px fw-600">
+                            {item?.Type || 'Không'}
+                          </span>
+                        </div>
+                        <div>
+                          Giá trị :
+                          <span className="pl-5px fw-600 text-danger">
+                            {PriceHelper.formatVND(item?.Price)}
+                          </span>
+                        </div>
+                        <div>
+                          Nội dung :
+                          <span className="pl-5px fw-500">
+                            {item.Content || 'Không'}
+                          </span>
+                        </div>
+                        <div>
+                          Ghi chú :
+                          <span className="pl-5px fw-500">
+                            {item.Note || 'Không'}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {(!List || List.length === 0) && (
+                  <div className="w-100 h-100 d-flex align-items-center justify-content-center">
+                    <div className="text-center">
+                      <img
+                        className="w-100 max-w-120px"
+                        src={AssetsHelpers.toAbsoluteUrl(
+                          '/_assets/images/data-empty.png'
+                        )}
+                        alt="Không có dữ liệu"
+                      />
+                      <div className="text-center font-size-base fw-300">
+                        Không có hợp đồng.
+                      </div>
+                    </div>
+                  </div>
+                )}
               </Tab.Pane>
               <Tab.Pane className="h-100" eventKey="add">
                 <Formik
                   initialValues={{
-                    noti: {
-                      MemberID: MemberID,
-                      Date: '',
-                      Desc: '',
-                      IsNoti: false,
-                      ID: 0
+                    CreateDate: '',
+                    Content: '',
+                    Price: '',
+                    EndDate: '',
+                    Note: '',
+                    Type: {
+                      label: 'Ký mới',
+                      value: 'Ký mới'
                     }
                   }}
                   onSubmit={onSubmit}
@@ -390,14 +296,14 @@ function PickerContract({ children, data, onRefresh }) {
                           <div className="form-group mb-0">
                             <label>Ngày</label>
                             <DatePicker
-                              name="noti.Date"
+                              name="CreateDate"
                               onChange={date => {
-                                setFieldValue('noti.Date', date, false)
+                                setFieldValue('CreateDate', date, false)
                               }}
-                              selected={values.noti.Date}
+                              selected={values.CreateDate}
                               placeholderText="Chọn ngày"
                               className={`form-control ${
-                                errors?.noti?.Date && touched?.noti?.Date
+                                errors?.CreateDate && touched?.CreateDate
                                   ? 'is-invalid solid-invalid'
                                   : ''
                               }`}
@@ -410,14 +316,14 @@ function PickerContract({ children, data, onRefresh }) {
                           <div className="form-group mb-0">
                             <label>Hạn dùng</label>
                             <DatePicker
-                              name="noti.Date"
+                              name="EndDate"
                               onChange={date => {
-                                setFieldValue('noti.Date', date, false)
+                                setFieldValue('EndDate', date, false)
                               }}
-                              selected={values.noti.Date}
+                              selected={values.EndDate}
                               placeholderText="Chọn ngày"
                               className={`form-control ${
-                                errors?.noti?.Date && touched?.noti?.Date
+                                errors?.EndDate && touched?.EndDate
                                   ? 'is-invalid solid-invalid'
                                   : ''
                               }`}
@@ -432,49 +338,42 @@ function PickerContract({ children, data, onRefresh }) {
                         <div className="form-group mb-15px">
                           <label>Nội dung</label>
                           <textarea
-                            name="noti.Desc"
+                            name="Content"
                             className={`form-control ${
-                              errors?.noti?.Desc && touched?.noti?.Desc
+                              errors?.Content && touched?.Content
                                 ? 'is-invalid solid-invalid'
                                 : ''
                             }`}
                             rows="2"
-                            value={values?.noti?.Desc}
+                            value={values?.Content}
                             onChange={handleChange}
                             onBlur={handleBlur}
                           ></textarea>
                         </div>
                         <div className="form-group mb-15px">
                           <label>Giá trị</label>
-                          <DatePicker
-                            name="noti.Date"
-                            onChange={date => {
-                              setFieldValue('noti.Date', date, false)
+                          <NumericFormat
+                            className="form-control"
+                            allowLeadingZeros={true}
+                            thousandSeparator={true}
+                            value={values.Price}
+                            placeholder="Nhập giá trị"
+                            onValueChange={val => {
+                              setFieldValue(
+                                'Price',
+                                val.floatValue || '',
+                                false
+                              )
                             }}
-                            selected={values.noti.Date}
-                            placeholderText="Chọn ngày"
-                            className={`form-control ${
-                              errors?.noti?.Date && touched?.noti?.Date
-                                ? 'is-invalid solid-invalid'
-                                : ''
-                            }`}
-                            dateFormat="dd/MM/yyyy"
-                            onBlur={handleBlur}
-                            autoComplete="off"
-                            //dateFormatCalendar="MMMM"
                           />
                         </div>
                         <div className="form-group mb-15px">
                           <label>Ghi chú</label>
                           <textarea
-                            name="noti.Desc"
-                            className={`form-control ${
-                              errors?.noti?.Desc && touched?.noti?.Desc
-                                ? 'is-invalid solid-invalid'
-                                : ''
-                            }`}
+                            name="Note"
+                            className={`form-control`}
                             rows="2"
-                            value={values?.noti?.Desc}
+                            value={values?.Note}
                             onChange={handleChange}
                             onBlur={handleBlur}
                           ></textarea>
@@ -489,10 +388,10 @@ function PickerContract({ children, data, onRefresh }) {
                             name="Type"
                             //menuIsOpen={true}
                             onChange={otp => {
-                              onSubmit(otp)
+                              setFieldValue('Type', otp, false)
                             }}
-                            value=""
-                            isClearable={true}
+                            value={values.Type}
+                            //isClearable={true}
                             options={[
                               {
                                 label: 'Gia hạn',
@@ -510,12 +409,12 @@ function PickerContract({ children, data, onRefresh }) {
                             type="submit"
                             className={clsx(
                               'btn btn-success w-100',
-                              btnLoading &&
+                              updateMutation.isPending &&
                                 'spinner spinner-white spinner-right'
                             )}
-                            disabled={btnLoading}
+                            disabled={!teleAdv || updateMutation.isPending}
                           >
-                            Thêm mới
+                            {teleAdv ? 'Thêm mới' : 'Không có quyền'}
                           </button>
                         </div>
                       </Form>

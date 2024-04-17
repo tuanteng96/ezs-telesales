@@ -2,10 +2,8 @@ import React, { useContext, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { Formik, Form } from 'formik'
 import configApi from 'src/api/config.api'
-import SelectProductService from 'src/components/Selects/SelectProductService'
 import DatePicker, { registerLocale } from 'react-datepicker'
 import SelectStaffs from 'src/components/Selects/SelectStaffs'
-import { NumericFormat } from 'react-number-format'
 import clsx from 'clsx'
 import Skeleton from 'react-loading-skeleton'
 import MemberTransfer from './MemberTransfer'
@@ -13,6 +11,7 @@ import telesalesApi from 'src/api/telesales.api'
 import { useSelector } from 'react-redux'
 import { TelesalesContext } from 'src/features/Telesales'
 import SelectStocks from 'src/components/Selects/SelectStocks'
+import Select from 'react-select'
 
 import vi from 'date-fns/locale/vi' // the locale you want
 import MemberTransferImport from './MemberTransferImport'
@@ -363,24 +362,129 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                     </div>
                   </div>
                   {teleAdv && (
-                    <>
-                      <div className="form-group">
-                        <label className="font-label text-muted mb-5px">
-                          Chọn theo nhân viên
-                        </label>
-                        <SelectStaffs
-                          adv={true}
-                          className="select-control"
-                          menuPosition="fixed"
-                          menuPlacement="top"
-                          name="filter.tele_user_id"
-                          onChange={otp => {
-                            setFieldValue('filter.tele_user_id', otp, false)
-                          }}
-                          value={values.filter.tele_user_id}
-                          isClearable={true}
-                        />
-                      </div>
+                    <div className="form-group mb-15px">
+                      <label className="font-label text-muted mb-5px">
+                        Sale phụ trách
+                      </label>
+                      <SelectStaffs
+                        adv={true}
+                        className="select-control"
+                        menuPosition="fixed"
+                        menuPlacement="top"
+                        name="filter.tele_user_id"
+                        onChange={otp => {
+                          setFieldValue('filter.tele_user_id', otp, false)
+                        }}
+                        value={values.filter.tele_user_id}
+                        isClearable={true}
+                      />
+                    </div>
+                  )}
+                  <div className="form-group mb-15px">
+                    <label className="font-label text-muted mb-5px">
+                      Support Phụ trách
+                    </label>
+                    <SelectStaffs
+                      adv={true}
+                      className="select-control"
+                      menuPosition="fixed"
+                      menuPlacement="top"
+                      name="filter.UserSupportID"
+                      onChange={otp => {
+                        setFieldValue('filter.UserSupportID', otp, false)
+                      }}
+                      value={values.filter.UserSupportID}
+                      isClearable={true}
+                    />
+                  </div>
+                  <div className="form-group mb-15px">
+                    <label className="font-label text-muted mb-5px">
+                      Người tạo
+                    </label>
+                    <SelectStaffs
+                      adv={true}
+                      className="select-control"
+                      menuPosition="fixed"
+                      menuPlacement="top"
+                      name="filter.UserID"
+                      onChange={otp => {
+                        setFieldValue('filter.UserID', otp, false)
+                      }}
+                      value={values.filter.UserID}
+                      isClearable={true}
+                    />
+                  </div>
+                  <div className="form-group mb-15px">
+                    <label className="font-label text-muted mb-5px">
+                      Tình trạng
+                    </label>
+                    <Select
+                      isLoading={loading}
+                      className="select-control"
+                      classNamePrefix="select"
+                      placeholder="Chọn"
+                      menuPosition="fixed"
+                      name="filter.Status"
+                      onChange={otp => {
+                        setFieldValue('filter.Status', otp, false)
+                      }}
+                      value={values.filter.Status}
+                      isClearable={true}
+                      options={[
+                        {
+                          label: 'Đang hoạt động',
+                          value: 'Đang hoạt động'
+                        },
+                        {
+                          label: 'Đã hết hạn hoặc bỏ',
+                          value: 'Đã hết hạn hoặc bỏ'
+                        }
+                      ]}
+                    />
+                  </div>
+                  <div className="form-group mb-15px">
+                    <label className="font-label text-muted mb-5px">
+                      Loại khách hàng
+                    </label>
+                    <Select
+                      isLoading={loading}
+                      className="select-control"
+                      classNamePrefix="select"
+                      placeholder="Chọn"
+                      menuPosition="fixed"
+                      name="filter.Type"
+                      onChange={otp => {
+                        setFieldValue('filter.Type', otp, false)
+                      }}
+                      value={values.filter.Type}
+                      isClearable={true}
+                      options={[
+                        {
+                          label: 'Khách hàng công ty',
+                          value: 'Khách hàng công ty'
+                        },
+                        {
+                          label: 'Sale tìm kiếm',
+                          value: 'Sale tìm kiếm'
+                        }
+                      ]}
+                    />
+                  </div>
+                  <div className="form-group mb-15px">
+                    <label className="checkbox d-flex cursor-pointer">
+                      <input
+                        type="checkbox"
+                        name="filter.IsCoop"
+                        value={values.filter.IsCoop}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                      />
+                      <span className="checkbox-icon"></span>
+                      <span className="fw-500 font-label">Cộng tách viên</span>
+                    </label>
+                  </div>
+                  {teleAdv && (
+                    <div>
                       <label className="checkbox d-flex cursor-pointer mt-20px">
                         <input
                           type="checkbox"
@@ -394,7 +498,7 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                           Chưa chọn nhân viên
                         </span>
                       </label>
-                    </>
+                    </div>
                   )}
                 </div>
                 <div className="border-top p-15px d-flex">

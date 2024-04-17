@@ -23,6 +23,8 @@ import moreApi from 'src/api/more.api'
 import { AssetsHelpers } from 'src/helpers/AssetsHelpers'
 import Swal from 'sweetalert2'
 import PickerContract from './components/PickerContract'
+import PickerPoint from './components/PickerPoint'
+import clsx from 'clsx'
 
 moment.locale('vi')
 
@@ -86,7 +88,11 @@ const EditableCell = ({ rowData, container, showEditing, hideEditing }) => {
     >
       {!Editing && (
         <>
-          {value ? value.label : 'Chọn nhân viên'}
+          {value ? (
+            <span className="fw-500">{value.label}</span>
+          ) : (
+            <span className="text-muted">Chọn nhân viên</span>
+          )}
           {teleAdv && (
             <i className="fa-solid fa-user-pen pl-8px font-size-base text-muted"></i>
           )}
@@ -202,7 +208,11 @@ const EditableCellSupport = ({
     >
       {!Editing && (
         <>
-          {value ? value.label : 'Chọn Support'}
+          {value ? (
+            <span className="fw-500">{value.label}</span>
+          ) : (
+            <span className="text-muted2">Chọn Support</span>
+          )}
           {teleAdv && (
             <i className="fa-solid fa-user-pen pl-8px font-size-base text-muted"></i>
           )}
@@ -312,7 +322,15 @@ const EditableCellType = ({ rowData, container, showEditing, hideEditing }) => {
       ref={target}
       onClick={() => handleClick()}
     >
-      {!Editing && <>{value ? value.label : 'Chọn loại'}</>}
+      {!Editing && (
+        <>
+          {value ? (
+            <span className="fw-500">{value.label}</span>
+          ) : (
+            <span className="text-muted2">Chọn loại</span>
+          )}
+        </>
+      )}
       {Editing && target && (
         <Overlay
           target={target.current}
@@ -424,7 +442,16 @@ const EditableCellIsCoop = ({
       ref={target}
       onClick={() => handleClick()}
     >
-      {!Editing && <>{value ? value.label : 'Chọn'}</>}
+      {!Editing && (
+        <span
+          className={clsx(
+            'fw-500',
+            value?.value ? 'text-success' : 'text-danger'
+          )}
+        >
+          {value ? value.label : 'Chọn'}
+        </span>
+      )}
       {Editing && target && (
         <Overlay
           target={target.current}
@@ -439,7 +466,7 @@ const EditableCellIsCoop = ({
               {...props}
               style={{
                 position: 'absolute',
-                width: 190,
+                width: 120,
                 ...props.style
               }}
             >
@@ -544,7 +571,15 @@ const EditableCellStatus = ({
       ref={target}
       onClick={() => handleClick()}
     >
-      {!Editing && <>{value ? value.label : 'Chọn tình trạng'}</>}
+      {!Editing && (
+        <>
+          {value ? (
+            <span className="fw-500">{value.label}</span>
+          ) : (
+            <span className="text-muted2">Chọn tình trạng</span>
+          )}
+        </>
+      )}
       {Editing && target && (
         <Overlay
           target={target.current}
@@ -653,7 +688,13 @@ const EditableCellNote = ({ rowData, container, showEditing, hideEditing }) => {
             width: 290
           }}
         >
-          <Text tooltipMaxWidth={290}>{value || 'Nhập ghi chú'}</Text>
+          <Text tooltipMaxWidth={290}>
+            {value ? (
+              <span className="fw-500">{value}</span>
+            ) : (
+              <span className="text-muted2">Nhập ghi chú</span>
+            )}
+          </Text>
         </div>
       )}
       {Editing && target && (
@@ -755,7 +796,13 @@ const EditableCellSoftLink = ({
             width: 290
           }}
         >
-          <Text tooltipMaxWidth={290}>{value || 'Nhập link phần mềm'}</Text>
+          <Text tooltipMaxWidth={290}>
+            {value ? (
+              <span className="fw-500">{value}</span>
+            ) : (
+              <span className="text-muted2">Nhập link phần mềm</span>
+            )}
+          </Text>
         </div>
       )}
       {Editing && target && (
@@ -934,6 +981,9 @@ function TelesalesList(props) {
     filter: {
       UserID: '',
       UserSupportID: '',
+      Status: '',
+      IsCoop: false,
+      Type: '',
       tele_process: filtersRedux.tele_process || '', //Đang tiếp cận,Đặt lịch thành công
       tele_user_id: filtersRedux.tele_user_id
         ? filtersRedux.tele_user_id
@@ -982,6 +1032,10 @@ function TelesalesList(props) {
       ...filters,
       filter: {
         ...filters.filter,
+        Status: filters.filter?.Status?.value || '',
+        Type: filters.filter?.Type?.value || '',
+        UserID: filters.filter?.UserID?.value || 0,
+        UserSupportID: filters.filter?.UserSupportID?.value || 0,
         tele_user_id: tele_user_id_new,
         tele_process: filters.filter.tele_process
           ? filters.filter.tele_process.join(',')
@@ -1161,139 +1215,6 @@ function TelesalesList(props) {
           sortable: false
         },
         {
-          key: 'Type',
-          title: 'Loại khách hàng',
-          dataKey: 'Type',
-          width: 220,
-          sortable: false,
-          cellRenderer: ({ rowData, container }) => (
-            <EditableCellType
-              rowData={rowData}
-              container={container}
-              hideEditing={() => setIsEditing(false)}
-              showEditing={() => setIsEditing(true)}
-            />
-          )
-        },
-        {
-          key: 'IsCoop',
-          title: 'Cộng tác viên',
-          dataKey: 'IsCoop',
-          width: 220,
-          sortable: false,
-          cellRenderer: ({ rowData, container }) => (
-            <EditableCellIsCoop
-              rowData={rowData}
-              container={container}
-              hideEditing={() => setIsEditing(false)}
-              showEditing={() => setIsEditing(true)}
-            />
-          )
-        },
-        {
-          key: 'TeleTags',
-          title: 'Trạng thái',
-          dataKey: 'TeleTags',
-          width: 250,
-          sortable: false,
-          cellRenderer: ({ rowData, container }) => (
-            <PickerStatus data={rowData} onRefresh={onRefresh}></PickerStatus>
-            // <EditableCellProcess
-            //   rowData={rowData}
-            //   container={container}
-            //   hideEditing={() => setIsEditing(false)}
-            //   showEditing={() => setIsEditing(true)}
-            // />
-          )
-        },
-        {
-          key: 'Status',
-          title: 'Tình trạng',
-          dataKey: 'Status',
-          width: 220,
-          sortable: false,
-          cellRenderer: ({ rowData, container }) => (
-            <EditableCellStatus
-              rowData={rowData}
-              container={container}
-              hideEditing={() => setIsEditing(false)}
-              showEditing={() => setIsEditing(true)}
-            />
-          )
-        },
-        {
-          key: 'SoftLink',
-          title: 'Link phần mềm',
-          dataKey: 'SoftLink',
-          width: 290,
-          sortable: false,
-          cellRenderer: ({ rowData, container }) => (
-            <EditableCellSoftLink
-              rowData={rowData}
-              container={container}
-              hideEditing={() => setIsEditing(false)}
-              showEditing={() => setIsEditing(true)}
-            />
-          )
-        },
-        {
-          key: 'ContractDefault',
-          title: 'PDF hợp đồng',
-          dataKey: 'ContractDefault',
-          width: 220,
-          sortable: false,
-          cellRenderer: ({ rowData, container }) => (
-            <EditableCellPDF
-              rowData={rowData}
-              container={container}
-              hideEditing={() => setIsEditing(false)}
-              showEditing={() => setIsEditing(true)}
-            />
-          )
-        },
-        {
-          key: 'ContractJSON',
-          title: 'Hợp đồng',
-          dataKey: 'ContractJSON',
-          width: 250,
-          sortable: false,
-          cellRenderer: ({ rowData, container }) => (
-            <PickerContract data={rowData} onRefresh={onRefresh}>
-              {/* {({ open }) => (
-                <div onClick={open}>
-                  <div>
-                    {rowData.NotiList && rowData.NotiList.length > 0 ? (
-                      <>
-                        <div className="mt-8px fw-500">
-                          Ngày nhắc
-                          <span className="pl-5px">
-                            {moment(rowData.NotiList[0].Date).format(
-                              'DD-MM-YYYY'
-                            )}
-                          </span>
-                          {rowData.NotiList[0].IsNoti && (
-                            <span className="pl-5px font-size-xs text-success">
-                              - Đã nhắc
-                            </span>
-                          )}
-                        </div>
-                        <Text style={{ width: '230px' }} tooltipMaxWidth={250}>
-                          Nội dung :
-                          <span className="fw-500 pl-3px">
-                            {rowData.NotiList[0].Desc}
-                          </span>
-                        </Text>
-                      </>
-                    ) : (
-                      'Thêm lịch nhắc'
-                    )}
-                  </div>
-                </div>
-              )} */}
-            </PickerContract>
-          )
-        },
-        {
           key: 'TeleNote',
           title: 'Ghi chú',
           dataKey: 'TeleNote',
@@ -1430,6 +1351,120 @@ function TelesalesList(props) {
           width: 220,
           sortable: false,
           cellRenderer: ({ rowData, container }) => rowData?.User?.FullName
+        },
+        {
+          key: 'Type',
+          title: 'Loại khách hàng',
+          dataKey: 'Type',
+          width: 220,
+          sortable: false,
+          cellRenderer: ({ rowData, container }) => (
+            <EditableCellType
+              rowData={rowData}
+              container={container}
+              hideEditing={() => setIsEditing(false)}
+              showEditing={() => setIsEditing(true)}
+            />
+          )
+        },
+        {
+          key: 'IsCoop',
+          title: 'Cộng tác viên',
+          dataKey: 'IsCoop',
+          width: 150,
+          sortable: false,
+          cellRenderer: ({ rowData, container }) => (
+            <EditableCellIsCoop
+              rowData={rowData}
+              container={container}
+              hideEditing={() => setIsEditing(false)}
+              showEditing={() => setIsEditing(true)}
+            />
+          )
+        },
+        {
+          key: 'TeleTags',
+          title: 'Trạng thái',
+          dataKey: 'TeleTags',
+          width: 250,
+          sortable: false,
+          cellRenderer: ({ rowData, container }) => (
+            <PickerStatus data={rowData} onRefresh={onRefresh}></PickerStatus>
+            // <EditableCellProcess
+            //   rowData={rowData}
+            //   container={container}
+            //   hideEditing={() => setIsEditing(false)}
+            //   showEditing={() => setIsEditing(true)}
+            // />
+          )
+        },
+        {
+          key: 'Status',
+          title: 'Tình trạng',
+          dataKey: 'Status',
+          width: 220,
+          sortable: false,
+          cellRenderer: ({ rowData, container }) => (
+            <EditableCellStatus
+              rowData={rowData}
+              container={container}
+              hideEditing={() => setIsEditing(false)}
+              showEditing={() => setIsEditing(true)}
+            />
+          )
+        },
+        {
+          key: 'SoftLink',
+          title: 'Link phần mềm',
+          dataKey: 'SoftLink',
+          width: 290,
+          sortable: false,
+          cellRenderer: ({ rowData, container }) => (
+            <EditableCellSoftLink
+              rowData={rowData}
+              container={container}
+              hideEditing={() => setIsEditing(false)}
+              showEditing={() => setIsEditing(true)}
+            />
+          )
+        },
+        {
+          key: 'ContractDefault',
+          title: 'PDF hợp đồng',
+          dataKey: 'ContractDefault',
+          width: 220,
+          sortable: false,
+          cellRenderer: ({ rowData, container }) => (
+            <EditableCellPDF
+              rowData={rowData}
+              container={container}
+              hideEditing={() => setIsEditing(false)}
+              showEditing={() => setIsEditing(true)}
+            />
+          )
+        },
+        {
+          key: 'ContractJSON',
+          title: 'Hợp đồng',
+          dataKey: 'ContractJSON',
+          width: 250,
+          sortable: false,
+          cellRenderer: ({ rowData, container }) => (
+            <PickerContract
+              rowData={rowData}
+              onRefresh={onRefresh}
+            ></PickerContract>
+          )
+        },
+        {
+          key: 'PointJSON',
+          title: 'Tích điểm',
+          dataKey: 'PointJSON',
+          width: 250,
+          sortable: false,
+          cellRenderer: ({ rowData, container }) => (
+            <PickerPoint rowData={rowData} onRefresh={onRefresh}></PickerPoint>
+          )
         }
         // {
         //   key: 'action',

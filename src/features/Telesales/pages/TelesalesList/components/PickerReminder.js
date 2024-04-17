@@ -314,7 +314,7 @@ function PickerReminder({ children, data, onRefresh }) {
             )}
           </>
         ) : (
-          <>Thêm lịch nhắc</>
+          <div className="text-muted2">Thêm lịch nhắc</div>
         )}
       </div>
 

@@ -205,7 +205,7 @@ function PickerHistory({ children, data, onRefresh }) {
             )}
           </>
         ) : (
-          <>Thêm lịch sử chăm sóc</>
+          <div className="text-muted2">Thêm lịch sử chăm sóc</div>
         )}
       </div>
 

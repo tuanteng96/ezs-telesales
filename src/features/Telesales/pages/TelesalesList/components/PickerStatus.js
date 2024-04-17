@@ -157,7 +157,11 @@ function PickerStatus({ children, data, onRefresh }) {
   return (
     <>
       <div onClick={() => setVisible(true)}>
-        {Status ? Status : 'Chọn trạng thái'}
+        {Status ? (
+          <span className="fw-500">{Status}</span>
+        ) : (
+          <span className="text-muted2">Chọn trạng thái</span>
+        )}
       </div>
       {/* {children({
         open: () => setVisible(true),
