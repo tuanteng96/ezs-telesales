@@ -741,6 +741,10 @@ const EditableCellSoftLink = ({
 }) => {
   const [Editing, setEditing] = useState(false)
 
+  const { teleAdv } = useSelector(({ auth }) => ({
+    teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false
+  }))
+
   const [value, setValue] = useState(rowData?.SoftLink)
   const target = useRef(null)
   const typingTimeoutRef = useRef(null)
@@ -750,6 +754,7 @@ const EditableCellSoftLink = ({
   }, [rowData?.SoftLink])
 
   const handleClick = () => {
+    if (!teleAdv) return
     setEditing(true)
     showEditing()
   }
@@ -845,6 +850,10 @@ const EditableCellPDF = ({ rowData, container, showEditing, hideEditing }) => {
   const [value, setValue] = useState(rowData?.ContractDefault)
   const fileInputRef = useRef()
 
+  const { teleAdv } = useSelector(({ auth }) => ({
+    teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false
+  }))
+
   useEffect(() => {
     setValue(rowData?.ContractDefault)
   }, [rowData?.ContractDefault])
@@ -925,22 +934,27 @@ const EditableCellPDF = ({ rowData, container, showEditing, hideEditing }) => {
           >
             Xem hợp đồng
           </a>
-          <span
-            className="text-danger ml-15px cursor-pointer"
-            onClick={onDelete}
-          >
-            [Xoá]
-          </span>
+          {teleAdv && (
+            <span
+              className="text-danger ml-15px cursor-pointer"
+              onClick={onDelete}
+            >
+              [Xoá]
+            </span>
+          )}
         </div>
       )}
-      <button
-        type="button"
-        className="btn btn-out btn-default"
-        onClick={() => fileInputRef.current.click()}
-        disabled={uploadMutation.isPending}
-      >
-        {uploadMutation.isPending ? 'Đang upload ...' : 'Upload File'}
-      </button>
+      {teleAdv && (
+        <button
+          type="button"
+          className="btn btn-out btn-default"
+          onClick={() => fileInputRef.current.click()}
+          disabled={uploadMutation.isPending}
+        >
+          {uploadMutation.isPending ? 'Đang upload ...' : 'Upload File'}
+        </button>
+      )}
+
       <input
         title="Upload File"
         value=""

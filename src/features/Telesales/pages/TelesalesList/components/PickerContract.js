@@ -169,14 +169,17 @@ function PickerContract({ children, rowData, onRefresh }) {
             </Modal.Title>
           </Modal.Header>
           <Tab.Container activeKey={activeKey} onSelect={e => setActiveKey(e)}>
-            <Nav variant="pills" className="nav-contract">
-              <Nav.Item>
-                <Nav.Link eventKey="list">Danh sách</Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
-                <Nav.Link eventKey="add">Thêm mới</Nav.Link>
-              </Nav.Item>
-            </Nav>
+            {teleAdv && (
+              <Nav variant="pills" className="nav-contract">
+                <Nav.Item>
+                  <Nav.Link eventKey="list">Danh sách</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                  <Nav.Link eventKey="add">Thêm mới</Nav.Link>
+                </Nav.Item>
+              </Nav>
+            )}
+
             <Tab.Content className="flex-grow-1 overflow-auto">
               <Tab.Pane className="h-100" eventKey="list">
                 {List && List.length > 0 && (
