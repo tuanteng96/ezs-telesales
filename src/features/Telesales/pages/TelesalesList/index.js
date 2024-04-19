@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import telesalesApi from 'src/api/telesales.api'
 import ReactBaseTableInfinite from 'src/components/Tables/ReactBaseTableInfinite'
 import Sidebar from './components/Sidebar'
-import { Overlay } from 'react-bootstrap'
+import { Dropdown, Overlay } from 'react-bootstrap'
 import SelectStaffs from 'src/components/Selects/SelectStaffs'
 import { TelesalesContext } from '../..'
 import { useWindowSize } from 'src/hooks/useWindowSize'
@@ -1024,6 +1024,72 @@ function TelesalesList(props) {
     pi: 1,
     ps: 20
   })
+  const [configs, setConfigs] = useState(
+    localStorage.getItem('_configs')
+      ? JSON.parse(localStorage.getItem('_configs'))
+      : [
+          {
+            title: 'Ngày tạo & Cơ sở',
+            visible: true
+          },
+          {
+            title: 'Trạng thái',
+            visible: true
+          },
+          {
+            title: 'Ghi chú',
+            visible: true
+          },
+          {
+            title: 'Lịch sử chăm sóc',
+            visible: true
+          },
+          {
+            title: 'Lịch nhắc',
+            visible: true
+          },
+          {
+            title: 'Sale phụ trách',
+            visible: true
+          },
+          {
+            title: 'Support phụ trách',
+            visible: true
+          },
+          {
+            title: 'Người tạo',
+            visible: true
+          },
+          {
+            title: 'Loại khách hàng',
+            visible: true
+          },
+          {
+            title: 'Cộng tác viên',
+            visible: true
+          },
+          {
+            title: 'Tình trạng',
+            visible: true
+          },
+          {
+            title: 'Link phần mềm',
+            visible: true
+          },
+          {
+            title: 'PDF hợp đồng',
+            visible: true
+          },
+          {
+            title: 'Hợp đồng',
+            visible: true
+          },
+          {
+            title: 'Tích điểm',
+            visible: true
+          }
+        ]
+  )
 
   const { width } = useWindowSize()
 
@@ -1226,7 +1292,24 @@ function TelesalesList(props) {
             </div>
           ),
           width: 200,
-          sortable: false
+          sortable: false,
+          frozen: 'left'
+        },
+        {
+          key: 'TeleTags',
+          title: 'Trạng thái',
+          dataKey: 'TeleTags',
+          width: 250,
+          sortable: false,
+          cellRenderer: ({ rowData, container }) => (
+            <PickerStatus data={rowData} onRefresh={onRefresh}></PickerStatus>
+            // <EditableCellProcess
+            //   rowData={rowData}
+            //   container={container}
+            //   hideEditing={() => setIsEditing(false)}
+            //   showEditing={() => setIsEditing(true)}
+            // />
+          )
         },
         {
           key: 'TeleNote',
@@ -1397,22 +1480,6 @@ function TelesalesList(props) {
           )
         },
         {
-          key: 'TeleTags',
-          title: 'Trạng thái',
-          dataKey: 'TeleTags',
-          width: 250,
-          sortable: false,
-          cellRenderer: ({ rowData, container }) => (
-            <PickerStatus data={rowData} onRefresh={onRefresh}></PickerStatus>
-            // <EditableCellProcess
-            //   rowData={rowData}
-            //   container={container}
-            //   hideEditing={() => setIsEditing(false)}
-            //   showEditing={() => setIsEditing(true)}
-            // />
-          )
-        },
-        {
           key: 'Status',
           title: 'Tình trạng',
           dataKey: 'Status',
@@ -1526,6 +1593,14 @@ function TelesalesList(props) {
         //   frozen: width > 991 ? 'right' : false
         // }
       ]
+
+      newColumns.forEach(function (value, i) {
+        let index = configs.findIndex(x => x.title === value.title)
+        if (index > -1) {
+          newColumns[i].hidden = !configs[index].visible
+        }
+      })
+
       if (columnsSort && columnsSort.length > 0) {
         newColumns = newColumns.map(clm => {
           let newClm = { ...clm }
@@ -1540,7 +1615,7 @@ function TelesalesList(props) {
       return newColumns
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [width, ListTelesales]
+    [width, ListTelesales, configs]
   )
 
   const handleEndReached = () => {
@@ -1585,14 +1660,47 @@ function TelesalesList(props) {
           </div>
           <div className="w-85px w-md-auto d-flex">
             <Navbar ExportExcel={ExportExcel} IsLoadingEx={IsLoadingEx} />
-            {/* <button
-              type="button"
-              className="btn btn-primary"
-              onClick={onOpenModal}
-            >
-              <i className="far fa-bells pr-5px"></i>
-              <span className="d-none d-md-inline-block">Lịch nhắc</span>
-            </button> */}
+            <Dropdown className="d-inline mx-2">
+              <Dropdown.Toggle
+                id="dropdown-autoclose-true"
+                style={{
+                  borderRadius: '0.225rem'
+                }}
+              >
+                <i className="fal fa-tools"></i>
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu>
+                {configs &&
+                  configs.map((item, index) => (
+                    <div className="mb-8px" key={index}>
+                      <label className="checkbox d-flex cursor-pointer ml-10px min-w-150px w-150px">
+                        <input
+                          type="checkbox"
+                          name="filter"
+                          checked={item.visible}
+                          onChange={e => {
+                            let newConfigs = [...configs]
+                            let index = newConfigs.findIndex(
+                              x => x.title === item.title
+                            )
+                            if (index > -1) {
+                              newConfigs[index].visible = e.target.checked
+                            }
+                            setConfigs(newConfigs)
+                            localStorage.setItem(
+                              '_configs',
+                              JSON.stringify(newConfigs)
+                            )
+                          }}
+                        />
+                        <span className="checkbox-icon" />
+                        <span className="fw-500">{item.title}</span>
+                      </label>
+                    </div>
+                  ))}
+              </Dropdown.Menu>
+            </Dropdown>
             <button
               type="button"
               className="btn btn-primary d-lg-none ml-5px"
