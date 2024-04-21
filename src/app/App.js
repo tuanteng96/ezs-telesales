@@ -17,8 +17,11 @@ import StatisticalList from 'src/features/Statistical/pages/StatisticalList'
 import Reminder from 'src/features/Reminder'
 import ReminderList from 'src/features/Reminder/pages/ReminderList'
 import ReplyCallNow from 'src/components/ReplyCallNow/ReplyCallNow'
+import Work from 'src/features/Work'
+import WorkList from 'src/features/Work/pages/WorkList'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -89,6 +92,17 @@ function App({ store, persistor }) {
               >
                 <Route index element={<Navigate to="danh-sach" replace />} />
                 <Route path="danh-sach" element={<ReminderList />} />
+              </Route>
+              <Route
+                path="/hoat-dong"
+                element={
+                  <UnauthenticateGuard>
+                    <Work />
+                  </UnauthenticateGuard>
+                }
+              >
+                <Route index element={<Navigate to="danh-sach" replace />} />
+                <Route path="danh-sach" element={<WorkList />} />
               </Route>
               <Route
                 path="/yeu-cau-quyen-truy-cap"
