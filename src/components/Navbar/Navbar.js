@@ -96,21 +96,27 @@ function Navbar({ ExportExcel, IsLoadingEx }) {
             <span className="d-none d-md-inline-block">Thống kê</span>
           </NavLink>
           <NavLink
-            to={bagde > 0 ? "/lich-nhac/danh-sach?auth=my" : '/lich-nhac/danh-sach'}
+            to={
+              bagde > 0
+                ? '/lich-nhac/danh-sach?auth=my'
+                : '/lich-nhac/danh-sach'
+            }
             className={({ isActive }) =>
               clsx(
                 'd-flex align-items-center',
                 isActive
                   ? 'btn btn-primary ml-8px fw-500'
-                  : `${bagde > 0 ? 'btn-danger' : 'btn-default'} btn btn-out ml-8px fw-500`
+                  : `${
+                      bagde > 0 ? 'btn-danger' : 'btn-default'
+                    } btn btn-out ml-8px fw-500`
               )
             }
           >
-            <i className={clsx('far fa-bells pr-5px', bagde > 0 && 'bell' )}></i>
+            <i className={clsx('far fa-bells pr-5px', bagde > 0 && 'bell')}></i>
             <span className="d-none d-md-inline-block">Lịch nhắc</span>
             {bagde > 0 && (
               <div
-                className='text-danger'
+                className="text-danger"
                 style={{
                   width: '18px',
                   height: '18px',
@@ -119,12 +125,23 @@ function Navbar({ ExportExcel, IsLoadingEx }) {
                   fontSize: '13px',
                   lineHeight: '18px',
                   marginLeft: '8px',
-                  fontWeight: '600',
+                  fontWeight: '600'
                 }}
               >
                 {bagde}
               </div>
             )}
+          </NavLink>
+          <NavLink
+            to="/hoat-dong/danh-sach"
+            className={({ isActive }) =>
+              isActive
+                ? 'btn btn-primary ml-8px fw-500'
+                : 'btn btn-out btn-default ml-8px fw-500'
+            }
+          >
+            <i className="far fa-sort-amount-up-alt pr-5px"></i>
+            <span className="d-none d-md-inline-block">Hoạt động</span>
           </NavLink>
         </>
       ) : (
@@ -166,6 +183,17 @@ function Navbar({ ExportExcel, IsLoadingEx }) {
             >
               <i className="far fa-bells pr-5px"></i>
               <span>Lịch nhắc</span>
+            </NavLink>
+            <NavLink
+              to="/hoạt động/danh-sach"
+              className={({ isActive }) =>
+                isActive
+                  ? 'text-primary fw-500 d-block py-6px text-decoration-none'
+                  : 'fw-500 d-block py-6px text-decoration-none'
+              }
+            >
+              <i className="far fa-sort-amount-up-alt pr-5px"></i>
+              <span>Hoạt động</span>
             </NavLink>
           </Dropdown.Menu>
         </Dropdown>

@@ -88,6 +88,9 @@ const telesalesApi = {
   getListStatisticals: data => {
     return http.post('/api/v3/Tele23@list_tele', JSON.stringify(data))
   },
+  getListWorkReport: data => {
+    return http.post('/api/v3/member25@ActivityReport', JSON.stringify(data))
+  },
   callNow: data =>
     http.post('/api/third/SBPhonePA@CallNow', JSON.stringify(data))
 }
