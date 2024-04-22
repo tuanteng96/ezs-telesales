@@ -1004,7 +1004,7 @@ function TelesalesList(props) {
       tele_process: filtersRedux.tele_process || '', //Đang tiếp cận,Đặt lịch thành công
       tele_user_id: filtersRedux.tele_user_id
         ? filtersRedux.tele_user_id
-        : ky_thuat?.hasRight
+        : ky_thuat?.hasRight && !co_ban.hasRight
         ? ''
         : {
             label: User.FullName,
