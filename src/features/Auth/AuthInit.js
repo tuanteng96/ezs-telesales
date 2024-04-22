@@ -57,16 +57,64 @@ function AuthInit(props) {
               hasRight: true,
               stocks: [{ ID: 0, Title: 'Cser Hà Nội' }],
               IsAllStock: true
+              // jdata: [
+              //   { name: 'co_ban', checked: true, stocks: '8975' },
+              //   { name: 'ky_thuat', checked: true, stocks: '8975' }
+              // ]
             },
             teleAdv: {
               hasRight: true,
               stocks: [{ ID: 0, Title: 'Cser Hồ Chí Minh' }],
               IsAllStock: true
             }
+          },
+          rightTree: {
+            groups: [
+              {
+                group: 'Phần mềm',
+                rights: [
+                  {
+                    name: 'tele',
+                    text: 'Telesale',
+                    subs: [
+                      {
+                        name: 'co_ban',
+                        stocks: '',
+                        text: 'Truy cập',
+                        hasRight: true
+                      },
+                      {
+                        name: 'nang_cao',
+                        stocks: '',
+                        text: 'Phân KH cho nhân viên',
+                        hasRight: true
+                      },
+                      {
+                        hasRight: true,
+                        name: 'ky_thuat',
+                        stocks: '8975',
+                        text: 'Kỹ thuật'
+                      },
+                      {
+                        hasRight: true,
+                        name: 'hop_dong',
+                        stocks: '8975',
+                        text: 'Hợp đồng'
+                      },
+                      {
+                        name: 'ke_toan',
+                        stocks: '',
+                        text: 'Kế toán'
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
           }
         }
         window.top.token =
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBdXRoMlR5cGUiOiJVc2VyRW50IiwiSUQiOiIxIiwiVG9rZW5JZCI6IjEwMzExNDEwMzUxMyIsIm5iZiI6MTcxMzM2NzQ3OCwiZXhwIjoxNzEzOTcyMjc4LCJpYXQiOjE3MTMzNjc0Nzh9.pXkZj3dfMwUyq_a73HwNxxEw31KwcuKSXX-8iG_tMvM'
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBdXRoMlR5cGUiOiJVc2VyRW50IiwiSUQiOiIxIiwiVG9rZW5JZCI6IjIiLCJuYmYiOjE3MTM3ODMyMDMsImV4cCI6MTcxNDM4ODAwMywiaWF0IjoxNzEzNzgzMjAzfQ.wHbH3aiKMDI_d4iHrLEf7M4n2QAYn_gtwzuBnOCJqy4'
         window.top.GlobalConfig = {
           Admin: {
             kpiSortColumn: [

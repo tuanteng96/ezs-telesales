@@ -10,12 +10,12 @@ import MemberTransfer from './MemberTransfer'
 import telesalesApi from 'src/api/telesales.api'
 import { useSelector } from 'react-redux'
 import { TelesalesContext } from 'src/features/Telesales'
-import SelectStocks from 'src/components/Selects/SelectStocks'
 import Select from 'react-select'
 
 import vi from 'date-fns/locale/vi' // the locale you want
 import MemberTransferImport from './MemberTransferImport'
 import { Dropdown } from 'react-bootstrap'
+import { useRoles } from 'src/hooks/useRoles'
 
 registerLocale('vi', vi) // register it with the name you want
 
@@ -33,12 +33,20 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
   const [isModal, setIsModal] = useState(false)
   const [isModalImport, setIsModalImport] = useState(false)
   const { isSidebar, onHideSidebar } = useContext(TelesalesContext)
+
   const { teleAdv } = useSelector(({ auth }) => ({
     teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false
   }))
 
+  const { ky_thuat, co_ban, nang_cao } = useRoles([
+    'ky_thuat',
+    'co_ban',
+    'nang_cao'
+  ])
+
   useEffect(() => {
     getTypeConfig()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const getTypeConfig = async () => {
@@ -47,7 +55,23 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
       const { data } = await configApi.getConfigName('tagkh')
       if (data && data.data && data?.data.length > 0) {
         const result = JSON.parse(data.data[0].Value)
-        setListType(result)
+        let tags = []
+        if (ky_thuat?.hasRight && co_ban?.hasRight) {
+          setListType(result)
+        } else {
+          for (let i of result) {
+            if (ky_thuat?.hasRight) {
+              if (i.Title.includes('Support')) {
+                tags.push(i)
+              }
+            } else {
+              if (!i.Title.includes('Support')) {
+                tags.push(i)
+              }
+            }
+          }
+          setListType(tags)
+        }
       }
       setLoadingType(false)
     } catch (error) {
@@ -278,7 +302,7 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                         </div>
                       </div>
                     ))}
-                  <div className="mb-15px form-group">
+                  {/* <div className="mb-15px form-group">
                     <label className="font-label text-muted mb-5px">
                       Cơ sở
                     </label>
@@ -292,7 +316,7 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                         setFieldValue('filter.StockID', otp ? otp.value : '')
                       }}
                     />
-                  </div>
+                  </div> */}
                   <div className="mb-15px form-group">
                     <label className="font-label text-muted mb-5px">
                       Ngày tạo khách hàng
@@ -361,7 +385,7 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                       </div>
                     </div>
                   </div>
-                  {teleAdv && (
+                  {nang_cao.hasRight && (
                     <div className="form-group mb-15px">
                       <label className="font-label text-muted mb-5px">
                         Sale phụ trách
@@ -380,6 +404,7 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                       />
                     </div>
                   )}
+
                   <div className="form-group mb-15px">
                     <label className="font-label text-muted mb-5px">
                       Support Phụ trách

@@ -9,13 +9,15 @@ import configApi from 'src/api/config.api'
 
 import moment from 'moment'
 import 'moment/locale/vi'
+import { useSelector } from 'react-redux'
 
 moment.locale('vi')
 
 const initialValue = {
   TeleTags: '',
   TeleTagsKH: '',
-  TeleStar: ''
+  TeleStar: '',
+  TeleSupport: ''
 }
 
 function PickerStatus({ children, data, onRefresh }) {
@@ -27,9 +29,10 @@ function PickerStatus({ children, data, onRefresh }) {
   const [initialValues, setInitialValues] = useState(initialValue)
   const [Status, setStatus] = useState('')
 
-  // const { teleAdv } = useSelector(({ auth }) => ({
-  //   teleAdv: auth?.Info?.rightsSum?.teleAdv || false
-  // }))
+  const { teleAdv, jdata } = useSelector(({ auth }) => ({
+    teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false,
+    jdata: auth?.Info?.rightsSum?.tele?.jdata || null
+  }))
 
   useEffect(() => {
     setStatus(data?.TeleTags)
@@ -39,6 +42,8 @@ function PickerStatus({ children, data, onRefresh }) {
     let ListTypeTags = []
     let ListTypeTagsKH = []
     let ListTypeStar = []
+    let ListSupport = []
+
     if (ListType && ListType.length > 0) {
       for (let type of ListType) {
         if (type.Title === 'Tag khách hàng') {
@@ -51,6 +56,12 @@ function PickerStatus({ children, data, onRefresh }) {
           if (type.Children) {
             for (let x of type.Children) {
               ListTypeStar.push(x)
+            }
+          }
+        } else if (type.Title.includes('Support')) {
+          if (type.Children) {
+            for (let x of type.Children) {
+              ListSupport.push(x)
             }
           }
         } else {
@@ -71,7 +82,7 @@ function PickerStatus({ children, data, onRefresh }) {
     let newTeleTags = ''
     let newTeleTagsKH = ''
     let newTeleStar = ''
-
+    let newListSupport = []
     for (let x of TeleTagsArr) {
       if (ListTypeTags.some(s => x === s.Title)) {
         newTeleTags = x
@@ -82,13 +93,16 @@ function PickerStatus({ children, data, onRefresh }) {
       if (ListTypeStar.some(s => x === s.Title)) {
         newTeleStar = x
       }
+      if (ListSupport.some(s => x === s.Title)) {
+        newListSupport.push(x)
+      }
     }
-
     setInitialValues(prevState => ({
       ...prevState,
       TeleTags: newTeleTags,
       TeleTagsKH: newTeleTagsKH,
-      TeleStar: newTeleStar
+      TeleStar: newTeleStar,
+      TeleSupport: newListSupport.toString()
     }))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, ListType])
@@ -112,17 +126,18 @@ function PickerStatus({ children, data, onRefresh }) {
       console.log(error)
     }
   }
+
   const onSubmit = (
-    { TeleTags, TeleTagsKH, TeleStar, ...values },
+    { TeleTags, TeleTagsKH, TeleStar, TeleSupport, ...values },
     { resetForm }
   ) => {
     let valueWrap = [
       ...(TeleTags ? TeleTags.split(',') : []),
       ...(TeleTagsKH ? TeleTagsKH.split(',') : []),
-      ...(TeleStar ? TeleStar.split(',') : [])
+      ...(TeleStar ? TeleStar.split(',') : []),
+      ...(TeleSupport ? TeleSupport.split(',') : [])
     ]
     var valuePost = valueWrap ? [...new Set(valueWrap)] : ''
-
     setBtnLoading(true)
 
     let newData = {
@@ -143,17 +158,17 @@ function PickerStatus({ children, data, onRefresh }) {
             timeOut: 1500
           })
         setStatus(valuePost ? valuePost.join(',') : '')
-        // onRefresh(() => {
-        //   setVisible(false)
-        //   setBtnLoading(false)
-        //   window.top?.toastr &&
-        //     window.top?.toastr.success('Đã cập nhập', '', {
-        //       timeOut: 1500
-        //     })
-        // })
       })
       .catch(error => console.log(error))
   }
+
+  let isSale = jdata
+    ? jdata.findIndex(x => x.name === 'co_ban' && x.checked)
+    : false
+  let isSupport = jdata
+    ? jdata.findIndex(x => x.name === 'ky_thuat' && x.checked)
+    : false
+
   return (
     <>
       <div onClick={() => setVisible(true)}>
@@ -206,11 +221,15 @@ function PickerStatus({ children, data, onRefresh }) {
                     <div className="grid grid-cols-3 gap-4">
                       {!loadingType && (
                         <>
-                          {ListType &&
+                          {(jdata
+                            ? isSale > -1 && isSupport === -1
+                            : teleAdv) &&
+                            ListType &&
                             ListType.filter(
                               x =>
                                 x.Title !== 'Tag khách hàng' &&
-                                x.Title !== 'Đánh giá'
+                                x.Title !== 'Đánh giá' &&
+                                !x.Title.includes('Support')
                             ).map((type, index) => (
                               <div className="mb-15px form-group" key={index}>
                                 <label className="font-label fw-700 font-size-15px">
@@ -246,7 +265,61 @@ function PickerStatus({ children, data, onRefresh }) {
                                 </div>
                               </div>
                             ))}
-                          {ListType &&
+                          {(jdata ? isSale > -1 && isSupport > -1 : teleAdv) &&
+                            ListType &&
+                            ListType.filter(x =>
+                              x.Title.includes('Support')
+                            ).map((type, index) => (
+                              <div className="mb-15px form-group" key={index}>
+                                <label className="font-label fw-700 font-size-15px">
+                                  {type.Title}
+                                </label>
+                                <div className="checkbox-list mt-8px">
+                                  {type.Children &&
+                                    type.Children.map((x, idx) => (
+                                      <label
+                                        className="checkbox d-flex cursor-pointer"
+                                        key={idx}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          name="TeleSupport"
+                                          value={x.Title}
+                                          onChange={evt => {
+                                            let { checked, value } = evt.target
+                                            let newVal = values.TeleSupport
+                                              ? values.TeleSupport.split(',')
+                                              : []
+                                            if (!checked) {
+                                              newVal = newVal.filter(
+                                                x => x !== value
+                                              )
+                                            } else {
+                                              newVal.push(value)
+                                            }
+                                            setFieldValue(
+                                              'TeleSupport',
+                                              newVal.toString()
+                                            )
+                                          }}
+                                          onBlur={handleBlur}
+                                          checked={values.TeleSupport.includes(
+                                            x.Title
+                                          )}
+                                        />
+                                        <span className="checkbox-icon"></span>
+                                        <span className="fw-500 font-label font-size-15px">
+                                          {x.Title}
+                                        </span>
+                                      </label>
+                                    ))}
+                                </div>
+                              </div>
+                            ))}
+                          {(jdata
+                            ? isSale > -1 && isSupport === -1
+                            : teleAdv) &&
+                            ListType &&
                             ListType.filter(x => x.Title === 'Đánh giá').map(
                               (type, index) => (
                                 <div className="mb-15px form-group" key={index}>
@@ -287,7 +360,10 @@ function PickerStatus({ children, data, onRefresh }) {
                                 </div>
                               )
                             )}
-                          {ListType &&
+                          {(jdata
+                            ? isSale > -1 && isSupport === -1
+                            : teleAdv) &&
+                            ListType &&
                             ListType.filter(
                               x => x.Title === 'Tag khách hàng'
                             ).map((type, index) => (

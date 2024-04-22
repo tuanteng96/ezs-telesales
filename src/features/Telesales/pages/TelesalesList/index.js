@@ -25,6 +25,7 @@ import Swal from 'sweetalert2'
 import PickerContract from './components/PickerContract'
 import PickerPoint from './components/PickerPoint'
 import clsx from 'clsx'
+import { useRoles } from 'src/hooks/useRoles'
 
 moment.locale('vi')
 
@@ -979,6 +980,8 @@ function TelesalesList(props) {
       filtersRedux: telesales.filters
     })
   )
+  const { ky_thuat, co_ban } = useRoles(['ky_thuat', 'co_ban', 'nang_cao'])
+
   const [ListTelesales, setListTelesales] = useState([])
   const [loading, setLoading] = useState(false)
   const [PageCount, setPageCount] = useState(0)
@@ -1001,6 +1004,8 @@ function TelesalesList(props) {
       tele_process: filtersRedux.tele_process || '', //Đang tiếp cận,Đặt lịch thành công
       tele_user_id: filtersRedux.tele_user_id
         ? filtersRedux.tele_user_id
+        : ky_thuat?.hasRight
+        ? ''
         : {
             label: User.FullName,
             value: User.ID

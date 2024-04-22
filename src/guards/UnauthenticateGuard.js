@@ -1,13 +1,11 @@
 import React from 'react'
 import { Navigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useRoles } from 'src/hooks/useRoles'
 
 export default function UnauthenticateGuard({ children }) {
-  const { tele } = useSelector(({ auth }) => ({
-    tele: auth.Info?.rightsSum?.tele?.hasRight
-  }))
+  const { ky_thuat, co_ban } = useRoles(['ky_thuat', 'co_ban'])
 
-  if (!tele) {
+  if (!ky_thuat.hasRight && !co_ban.hasRight) {
     return <Navigate to="/yeu-cau-quyen-truy-cap" />
   }
 
