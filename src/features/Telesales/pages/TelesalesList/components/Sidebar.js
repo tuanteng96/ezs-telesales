@@ -38,10 +38,11 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
     teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false
   }))
 
-  const { ky_thuat, co_ban, nang_cao } = useRoles([
+  const { ky_thuat, co_ban, nang_cao, tele } = useRoles([
     'ky_thuat',
     'co_ban',
-    'nang_cao'
+    'nang_cao',
+    'tele'
   ])
 
   useEffect(() => {
@@ -56,7 +57,7 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
       if (data && data.data && data?.data.length > 0) {
         const result = JSON.parse(data.data[0].Value)
         let tags = []
-        if (ky_thuat?.hasRight && co_ban?.hasRight) {
+        if (tele?.hasRight) {
           setListType(result)
         } else {
           for (let i of result) {
@@ -404,7 +405,6 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                       />
                     </div>
                   )}
-
                   <div className="form-group mb-15px">
                     <label className="font-label text-muted mb-5px">
                       Support Phụ trách
@@ -495,6 +495,7 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                       ]}
                     />
                   </div>
+
                   <div className="form-group mb-15px">
                     <label className="checkbox d-flex cursor-pointer">
                       <input
@@ -508,7 +509,8 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                       <span className="fw-500 font-label">Cộng tách viên</span>
                     </label>
                   </div>
-                  {teleAdv && (
+
+                  {nang_cao.hasRight && (
                     <div>
                       <label className="checkbox d-flex cursor-pointer mt-20px">
                         <input
@@ -517,10 +519,29 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                           value={values.filter.emptyStaff}
                           onChange={handleChange}
                           onBlur={handleBlur}
+                          checked={values.filter.emptyStaff}
                         />
                         <span className="checkbox-icon"></span>
                         <span className="fw-500 font-label">
-                          Chưa chọn nhân viên
+                          Chưa chọn Sale
+                        </span>
+                      </label>
+                    </div>
+                  )}
+                  {(!ky_thuat.hasRight || tele.hasRight) && (
+                    <div>
+                      <label className="checkbox d-flex cursor-pointer mt-20px">
+                        <input
+                          type="checkbox"
+                          name="filter.emptySupport"
+                          value={values.filter.emptySupport}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          checked={values.filter.emptySupport}
+                        />
+                        <span className="checkbox-icon"></span>
+                        <span className="fw-500 font-label">
+                          Chưa chọn Support
                         </span>
                       </label>
                     </div>

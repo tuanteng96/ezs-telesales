@@ -15,7 +15,7 @@ import Select from 'react-select'
 import { NumericFormat } from 'react-number-format'
 import { useMutation } from '@tanstack/react-query'
 import { PriceHelper } from 'src/helpers/PriceHelper'
-import { useSelector } from 'react-redux'
+import { useRoles } from 'src/hooks/useRoles'
 
 moment.locale('vi')
 
@@ -32,9 +32,11 @@ function PickerContract({ children, rowData, onRefresh }) {
 
   const [activeKey, setActiveKey] = useState('list')
 
-  const { teleAdv } = useSelector(({ auth }) => ({
-    teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false
-  }))
+  const { ky_thuat, tele, nang_cao } = useRoles([
+    'ky_thuat',
+    'tele',
+    'nang_cao'
+  ])
 
   useEffect(() => {
     setList(rowData?.ContractJSON ? JSON.parse(rowData?.ContractJSON) : [])
@@ -169,7 +171,7 @@ function PickerContract({ children, rowData, onRefresh }) {
             </Modal.Title>
           </Modal.Header>
           <Tab.Container activeKey={activeKey} onSelect={e => setActiveKey(e)}>
-            {teleAdv && (
+            {(tele?.hasRight || (!ky_thuat.hasRight && nang_cao.hasRight)) && (
               <Nav variant="pills" className="nav-contract">
                 <Nav.Item>
                   <Nav.Link eventKey="list">Danh sách</Nav.Link>
@@ -189,7 +191,8 @@ function PickerContract({ children, rowData, onRefresh }) {
                         className="p-15px border-bottom position-relative"
                         key={index}
                       >
-                        {teleAdv && (
+                        {(tele?.hasRight ||
+                          (!ky_thuat.hasRight && nang_cao.hasRight)) && (
                           <div
                             className="text-danger shadow position-absolute bg-white right-20px top-20px w-40px h-40px d-flex justify-content-center align-items-center rounded-circle cursor-pointer"
                             onClick={() => onDelete(index)}
@@ -415,9 +418,9 @@ function PickerContract({ children, rowData, onRefresh }) {
                               updateMutation.isPending &&
                                 'spinner spinner-white spinner-right'
                             )}
-                            disabled={!teleAdv || updateMutation.isPending}
+                            disabled={updateMutation.isPending}
                           >
-                            {teleAdv ? 'Thêm mới' : 'Không có quyền'}
+                            Thêm mới
                           </button>
                         </div>
                       </Form>

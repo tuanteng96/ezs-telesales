@@ -76,6 +76,7 @@ function AuthInit(props) {
                   {
                     name: 'tele',
                     text: 'Telesale',
+                    hasRight: false,
                     subs: [
                       {
                         name: 'co_ban',
@@ -90,7 +91,7 @@ function AuthInit(props) {
                         hasRight: true
                       },
                       {
-                        hasRight: true,
+                        hasRight: false,
                         name: 'ky_thuat',
                         stocks: '8975',
                         text: 'Kỹ thuật'
@@ -104,7 +105,8 @@ function AuthInit(props) {
                       {
                         name: 'ke_toan',
                         stocks: '',
-                        text: 'Kế toán'
+                        text: 'Kế toán',
+                        hasRight: true
                       }
                     ]
                   }
@@ -114,7 +116,7 @@ function AuthInit(props) {
           }
         }
         window.top.token =
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBdXRoMlR5cGUiOiJVc2VyRW50IiwiSUQiOiIxMDQxNyIsIlRva2VuSWQiOiIzIiwibmJmIjoxNzEzNzk4NzYxLCJleHAiOjE3MTQ0MDM1NjEsImlhdCI6MTcxMzc5ODc2MX0.giuA6E7rXeBouqW-QsTlimhn8HVhB8IYHDdEmoiQyOA'
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBdXRoMlR5cGUiOiJVc2VyRW50IiwiSUQiOiIxIiwiVG9rZW5JZCI6IjE0MTgiLCJuYmYiOjE3MTM4NDIwOTAsImV4cCI6MTcxNDQ0Njg5MCwiaWF0IjoxNzEzODQyMDkwfQ.jrKK5gNv5scV1qmigqFuRXo4Pb9B-A5xft8ypo6Jv2U'
         window.top.GlobalConfig = {
           Admin: {
             kpiSortColumn: [

@@ -12,7 +12,7 @@ import 'moment/locale/vi'
 import { Formik, Form } from 'formik'
 import { NumericFormat } from 'react-number-format'
 import { useMutation } from '@tanstack/react-query'
-import { useSelector } from 'react-redux'
+import { useRoles } from 'src/hooks/useRoles'
 
 moment.locale('vi')
 
@@ -26,9 +26,11 @@ function PickerPoint({ children, rowData, onRefresh }) {
     rowData?.PointJSON ? JSON.parse(rowData?.PointJSON) : []
   )
 
-  const { teleAdv } = useSelector(({ auth }) => ({
-    teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false
-  }))
+  const { ky_thuat, tele, nang_cao } = useRoles([
+    'ky_thuat',
+    'tele',
+    'nang_cao'
+  ])
 
   useEffect(() => {
     setList(rowData?.PointJSON ? JSON.parse(rowData?.PointJSON) : [])
@@ -155,7 +157,7 @@ function PickerPoint({ children, rowData, onRefresh }) {
               </div>
             </Modal.Title>
           </Modal.Header>
-          {teleAdv && (
+          {(tele?.hasRight || (!ky_thuat.hasRight && nang_cao.hasRight)) && (
             <Formik
               initialValues={{
                 CreateDate: '',
@@ -252,7 +254,8 @@ function PickerPoint({ children, rowData, onRefresh }) {
                     className="p-15px border-bottom position-relative"
                     key={index}
                   >
-                    {teleAdv && (
+                    {(tele?.hasRight ||
+                      (!ky_thuat.hasRight && nang_cao.hasRight)) && (
                       <div
                         className="text-danger shadow position-absolute bg-white right-20px top-20px w-40px h-40px d-flex justify-content-center align-items-center rounded-circle cursor-pointer"
                         onClick={() => onDelete(index)}

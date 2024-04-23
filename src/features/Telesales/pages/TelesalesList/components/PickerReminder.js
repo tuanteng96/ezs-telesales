@@ -7,13 +7,13 @@ import telesalesApi from 'src/api/telesales.api'
 import { AssetsHelpers } from 'src/helpers/AssetsHelpers'
 import PerfectScrollbar from 'react-perfect-scrollbar'
 import Swal from 'sweetalert2'
-import { useSelector } from 'react-redux'
 import * as Yup from 'yup'
 import DatePicker from 'react-datepicker'
 import Text from 'react-texty'
 import moment from 'moment'
 import 'moment/locale/vi'
 import { Formik, Form } from 'formik'
+import { useRoles } from 'src/hooks/useRoles'
 
 moment.locale('vi')
 
@@ -163,9 +163,7 @@ function PickerReminder({ children, data, onRefresh }) {
   const [btnLoading, setBtnLoading] = useState(false)
   const [List, setList] = useState([])
 
-  const { teleAdv } = useSelector(({ auth }) => ({
-    teleAdv: auth?.Info?.rightsSum?.teleAdv || false
-  }))
+  const { ky_thuat, tele } = useRoles(['ky_thuat', 'tele'])
 
   useEffect(() => {
     if (MemberID && visible) {
@@ -272,7 +270,11 @@ function PickerReminder({ children, data, onRefresh }) {
 
   return (
     <>
-      <div onClick={() => setVisible(true)}>
+      <div
+        onClick={() =>
+          (!ky_thuat.hasRight || tele.hasRight) && setVisible(true)
+        }
+      >
         {List.length > 0 || (data.NotiList && data.NotiList.length > 0) ? (
           <>
             {List.length > 0 ? (
@@ -478,29 +480,23 @@ function PickerReminder({ children, data, onRefresh }) {
                           <OverlayComponent
                             onSubmit={onSubmit}
                             btnLoading={btnLoading}
-                            Button={() =>
-                              teleAdv && (
-                                <span
-                                  className="fw-500 text-success cursor-pointer text-underline font-size-sm mr-8px"
-                                  //onClick={() => onDelete(item)}
-                                >
-                                  Sửa
-                                </span>
-                              )
-                            }
+                            Button={() => (
+                              <span
+                                className="fw-500 text-success cursor-pointer text-underline font-size-sm mr-8px"
+                                //onClick={() => onDelete(item)}
+                              >
+                                Sửa
+                              </span>
+                            )}
                             item={item}
                             MemberID={MemberID}
                           />
-                          {(teleAdv ||
-                            moment(item.CreateDate).format('DD-MM-YYYY') ===
-                              moment().format('DD-MM-YYYY')) && (
-                            <span
-                              className="fw-500 text-danger cursor-pointer text-underline font-size-sm"
-                              onClick={() => onDelete(item)}
-                            >
-                              Xóa
-                            </span>
-                          )}
+                          <span
+                            className="fw-500 text-danger cursor-pointer text-underline font-size-sm"
+                            onClick={() => onDelete(item)}
+                          >
+                            Xóa
+                          </span>
                         </div>
                       </div>
                       {item.Date && (

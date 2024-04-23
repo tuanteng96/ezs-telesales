@@ -9,7 +9,7 @@ import configApi from 'src/api/config.api'
 
 import moment from 'moment'
 import 'moment/locale/vi'
-import { useSelector } from 'react-redux'
+import { useRoles } from 'src/hooks/useRoles'
 
 moment.locale('vi')
 
@@ -29,10 +29,7 @@ function PickerStatus({ children, data, onRefresh }) {
   const [initialValues, setInitialValues] = useState(initialValue)
   const [Status, setStatus] = useState('')
 
-  const { teleAdv, jdata } = useSelector(({ auth }) => ({
-    teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false,
-    jdata: auth?.Info?.rightsSum?.tele?.jdata || null
-  }))
+  const { ky_thuat, tele } = useRoles(['ky_thuat', 'tele'])
 
   useEffect(() => {
     setStatus(data?.TeleTags)
@@ -162,13 +159,6 @@ function PickerStatus({ children, data, onRefresh }) {
       .catch(error => console.log(error))
   }
 
-  let isSale = jdata
-    ? jdata.findIndex(x => x.name === 'co_ban' && x.checked)
-    : false
-  let isSupport = jdata
-    ? jdata.findIndex(x => x.name === 'ky_thuat' && x.checked)
-    : false
-
   return (
     <>
       <div onClick={() => setVisible(true)}>
@@ -221,9 +211,7 @@ function PickerStatus({ children, data, onRefresh }) {
                     <div className="grid grid-cols-3 gap-4">
                       {!loadingType && (
                         <>
-                          {(jdata
-                            ? isSale > -1 && isSupport === -1
-                            : teleAdv) &&
+                          {(tele.hasRight || !ky_thuat?.hasRight) &&
                             ListType &&
                             ListType.filter(
                               x =>
@@ -265,7 +253,7 @@ function PickerStatus({ children, data, onRefresh }) {
                                 </div>
                               </div>
                             ))}
-                          {(jdata ? isSale > -1 && isSupport > -1 : teleAdv) &&
+                          {(tele.hasRight || ky_thuat?.hasRight) &&
                             ListType &&
                             ListType.filter(x =>
                               x.Title.includes('Support')
@@ -316,9 +304,7 @@ function PickerStatus({ children, data, onRefresh }) {
                                 </div>
                               </div>
                             ))}
-                          {(jdata
-                            ? isSale > -1 && isSupport === -1
-                            : teleAdv) &&
+                          {(tele.hasRight || !ky_thuat?.hasRight) &&
                             ListType &&
                             ListType.filter(x => x.Title === 'Đánh giá').map(
                               (type, index) => (
@@ -360,9 +346,7 @@ function PickerStatus({ children, data, onRefresh }) {
                                 </div>
                               )
                             )}
-                          {(jdata
-                            ? isSale > -1 && isSupport === -1
-                            : teleAdv) &&
+                          {(tele.hasRight || !ky_thuat?.hasRight) &&
                             ListType &&
                             ListType.filter(
                               x => x.Title === 'Tag khách hàng'

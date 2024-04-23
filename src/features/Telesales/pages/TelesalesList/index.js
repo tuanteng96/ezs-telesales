@@ -30,9 +30,12 @@ import { useRoles } from 'src/hooks/useRoles'
 moment.locale('vi')
 
 const EditableCell = ({ rowData, container, showEditing, hideEditing }) => {
-  const { teleAdv } = useSelector(({ auth }) => ({
-    teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false
-  }))
+  const { ky_thuat, tele, nang_cao } = useRoles([
+    'ky_thuat',
+    'tele',
+    'nang_cao'
+  ])
+
   const [Editing, setEditing] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -52,9 +55,10 @@ const EditableCell = ({ rowData, container, showEditing, hideEditing }) => {
   }, [rowData?.TeleUser])
 
   const handleClick = () => {
-    if (!teleAdv) return
-    setEditing(true)
-    showEditing()
+    if (tele?.hasRight || (!ky_thuat.hasRight && nang_cao.hasRight)) {
+      setEditing(true)
+      showEditing()
+    }
   }
 
   const handleHide = () => {
@@ -94,7 +98,7 @@ const EditableCell = ({ rowData, container, showEditing, hideEditing }) => {
           ) : (
             <span className="text-muted">Chọn nhân viên</span>
           )}
-          {teleAdv && (
+          {(tele?.hasRight || (!ky_thuat.hasRight && nang_cao.hasRight)) && (
             <i className="fa-solid fa-user-pen pl-8px font-size-base text-muted"></i>
           )}
         </>
@@ -144,9 +148,12 @@ const EditableCellSupport = ({
   showEditing,
   hideEditing
 }) => {
-  const { teleAdv } = useSelector(({ auth }) => ({
-    teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false
-  }))
+  const { ky_thuat, tele, nang_cao, hop_dong } = useRoles([
+    'ky_thuat',
+    'tele',
+    'nang_cao',
+    'hop_dong'
+  ])
   const [Editing, setEditing] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -172,9 +179,14 @@ const EditableCellSupport = ({
   }, [rowData?.UserSupport])
 
   const handleClick = () => {
-    if (!teleAdv) return
-    setEditing(true)
-    showEditing()
+    if (
+      tele?.hasRight ||
+      (!ky_thuat.hasRight && nang_cao.hasRight) ||
+      hop_dong.hasRight
+    ) {
+      setEditing(true)
+      showEditing()
+    }
   }
 
   const handleHide = () => {
@@ -214,7 +226,7 @@ const EditableCellSupport = ({
           ) : (
             <span className="text-muted2">Chọn Support</span>
           )}
-          {teleAdv && (
+          {(tele?.hasRight || (!ky_thuat.hasRight && nang_cao.hasRight)) && (
             <i className="fa-solid fa-user-pen pl-8px font-size-base text-muted"></i>
           )}
         </>
@@ -260,9 +272,11 @@ const EditableCellSupport = ({
 }
 
 const EditableCellType = ({ rowData, container, showEditing, hideEditing }) => {
-  const { teleAdv } = useSelector(({ auth }) => ({
-    teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false
-  }))
+  const { ky_thuat, tele, nang_cao } = useRoles([
+    'ky_thuat',
+    'tele',
+    'nang_cao'
+  ])
   const [Editing, setEditing] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -288,9 +302,10 @@ const EditableCellType = ({ rowData, container, showEditing, hideEditing }) => {
   }, [rowData?.Type])
 
   const handleClick = () => {
-    if (!teleAdv) return
-    setEditing(true)
-    showEditing()
+    if (tele?.hasRight || (!ky_thuat.hasRight && nang_cao.hasRight)) {
+      setEditing(true)
+      showEditing()
+    }
   }
 
   const handleHide = () => {
@@ -388,9 +403,11 @@ const EditableCellIsCoop = ({
   showEditing,
   hideEditing
 }) => {
-  const { teleAdv } = useSelector(({ auth }) => ({
-    teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false
-  }))
+  const { ky_thuat, tele, nang_cao } = useRoles([
+    'ky_thuat',
+    'tele',
+    'nang_cao'
+  ])
   const [Editing, setEditing] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -408,9 +425,10 @@ const EditableCellIsCoop = ({
   }, [rowData?.IsCoop])
 
   const handleClick = () => {
-    if (!teleAdv) return
-    setEditing(true)
-    showEditing()
+    if (tele?.hasRight || (!ky_thuat.hasRight && nang_cao.hasRight)) {
+      setEditing(true)
+      showEditing()
+    }
   }
 
   const handleHide = () => {
@@ -509,9 +527,11 @@ const EditableCellStatus = ({
   showEditing,
   hideEditing
 }) => {
-  const { teleAdv } = useSelector(({ auth }) => ({
-    teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false
-  }))
+  const { ky_thuat, tele, nang_cao } = useRoles([
+    'ky_thuat',
+    'tele',
+    'nang_cao'
+  ])
   const [Editing, setEditing] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -537,9 +557,10 @@ const EditableCellStatus = ({
   }, [rowData?.Status])
 
   const handleClick = () => {
-    if (!teleAdv) return
-    setEditing(true)
-    showEditing()
+    if (tele?.hasRight || (!ky_thuat.hasRight && nang_cao.hasRight)) {
+      setEditing(true)
+      showEditing()
+    }
   }
 
   const handleHide = () => {
@@ -632,6 +653,7 @@ const EditableCellStatus = ({
 }
 
 const EditableCellNote = ({ rowData, container, showEditing, hideEditing }) => {
+  const { ky_thuat, tele } = useRoles(['ky_thuat', 'tele'])
   const [Editing, setEditing] = useState(false)
 
   const [value, setValue] = useState(rowData?.Desc)
@@ -643,8 +665,10 @@ const EditableCellNote = ({ rowData, container, showEditing, hideEditing }) => {
   }, [rowData?.Desc])
 
   const handleClick = () => {
-    setEditing(true)
-    showEditing()
+    if (!ky_thuat.hasRight || tele.hasRight) {
+      setEditing(true)
+      showEditing()
+    }
   }
 
   const handleHide = () => {
@@ -742,9 +766,11 @@ const EditableCellSoftLink = ({
 }) => {
   const [Editing, setEditing] = useState(false)
 
-  const { teleAdv } = useSelector(({ auth }) => ({
-    teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false
-  }))
+  const { ky_thuat, tele, nang_cao } = useRoles([
+    'ky_thuat',
+    'tele',
+    'nang_cao'
+  ])
 
   const [value, setValue] = useState(rowData?.SoftLink)
   const target = useRef(null)
@@ -755,9 +781,10 @@ const EditableCellSoftLink = ({
   }, [rowData?.SoftLink])
 
   const handleClick = () => {
-    if (!teleAdv) return
-    setEditing(true)
-    showEditing()
+    if (tele?.hasRight || (!ky_thuat.hasRight && nang_cao.hasRight)) {
+      setEditing(true)
+      showEditing()
+    }
   }
 
   const handleHide = () => {
@@ -851,9 +878,11 @@ const EditableCellPDF = ({ rowData, container, showEditing, hideEditing }) => {
   const [value, setValue] = useState(rowData?.ContractDefault)
   const fileInputRef = useRef()
 
-  const { teleAdv } = useSelector(({ auth }) => ({
-    teleAdv: auth?.Info?.rightsSum?.teleAdv?.hasRight || false
-  }))
+  const { ky_thuat, tele, nang_cao } = useRoles([
+    'ky_thuat',
+    'tele',
+    'nang_cao'
+  ])
 
   useEffect(() => {
     setValue(rowData?.ContractDefault)
@@ -935,7 +964,7 @@ const EditableCellPDF = ({ rowData, container, showEditing, hideEditing }) => {
           >
             Xem hợp đồng
           </a>
-          {teleAdv && (
+          {(tele?.hasRight || (!ky_thuat.hasRight && nang_cao.hasRight)) && (
             <span
               className="text-danger ml-15px cursor-pointer"
               onClick={onDelete}
@@ -945,7 +974,7 @@ const EditableCellPDF = ({ rowData, container, showEditing, hideEditing }) => {
           )}
         </div>
       )}
-      {teleAdv && (
+      {(tele?.hasRight || (!ky_thuat.hasRight && nang_cao.hasRight)) && (
         <button
           type="button"
           className="btn btn-out btn-default"
@@ -980,7 +1009,7 @@ function TelesalesList(props) {
       filtersRedux: telesales.filters
     })
   )
-  const { ky_thuat, co_ban } = useRoles(['ky_thuat', 'co_ban', 'nang_cao'])
+  const { ky_thuat, tele } = useRoles(['ky_thuat', 'co_ban', 'tele'])
 
   const [ListTelesales, setListTelesales] = useState([])
   const [loading, setLoading] = useState(false)
@@ -1004,7 +1033,7 @@ function TelesalesList(props) {
       tele_process: filtersRedux.tele_process || '', //Đang tiếp cận,Đặt lịch thành công
       tele_user_id: filtersRedux.tele_user_id
         ? filtersRedux.tele_user_id
-        : ky_thuat?.hasRight && !co_ban.hasRight
+        : ky_thuat?.hasRight && !tele.hasRight
         ? ''
         : {
             label: User.FullName,
@@ -1019,6 +1048,8 @@ function TelesalesList(props) {
       remains: filtersRedux.remains || '', //
       key: filtersRedux.key || '',
       emptyStaff: filtersRedux.emptyStaff || false,
+      emptySupport:
+        filtersRedux.emptySupport || !ky_thuat.hasRight ? null : false,
       NotiFrom: filtersRedux.NotiFrom || '',
       NotiTo: filtersRedux.NotiTo || '',
       HasNoti: filtersRedux.HasNoti || false,
@@ -1106,6 +1137,7 @@ function TelesalesList(props) {
   const getListTelesales = callback => {
     setLoading(true)
     let tele_user_id_new = ''
+    let UserSupportIDnew = ''
     if (filters.filter.emptyStaff) {
       tele_user_id_new = 0
     } else {
@@ -1113,14 +1145,24 @@ function TelesalesList(props) {
         ? filters.filter.tele_user_id.value
         : ''
     }
+    if (filters.filter.emptySupport) {
+      UserSupportIDnew = 0
+    } else {
+      UserSupportIDnew = filters.filter?.UserSupportID?.value || 0
+    }
     const newFilter = {
       ...filters,
       filter: {
         ...filters.filter,
+        emptySupport:
+          (!filters?.filter?.emptySupport && !ky_thuat.hasRight) ||
+          tele.hasRight
+            ? null
+            : filters?.filter?.emptySupport,
         Status: filters.filter?.Status?.value || '',
         Type: filters.filter?.Type?.value || '',
         UserID: filters.filter?.UserID?.value || 0,
-        UserSupportID: filters.filter?.UserSupportID?.value || 0,
+        UserSupportID: UserSupportIDnew,
         tele_user_id: tele_user_id_new,
         tele_process: filters.filter.tele_process
           ? filters.filter.tele_process.join(',')
@@ -1200,6 +1242,7 @@ function TelesalesList(props) {
           remains: '',
           key: key,
           emptyStaff: false,
+          emptySupport: false,
           NotiFrom: '',
           NotiTo: '',
           HasNoti: false,
@@ -1280,14 +1323,16 @@ function TelesalesList(props) {
             <div>
               <div
                 className="cursor-pointer"
-                onClick={() =>
-                  window?.top?.MemberEdit({
-                    Member: rowData,
-                    done: () =>
-                      window?.top?.getListTelesales &&
-                      window?.top?.getListTelesales()
-                  })
-                }
+                onClick={() => {
+                  if (tele.hasRight || !ky_thuat?.hasRight) {
+                    window?.top?.MemberEdit({
+                      Member: rowData,
+                      done: () =>
+                        window?.top?.getListTelesales &&
+                        window?.top?.getListTelesales()
+                    })
+                  }
+                }}
               >
                 <div className="fw-600">{rowData?.FullName}</div>
                 <div className="font-number">
@@ -1620,7 +1665,7 @@ function TelesalesList(props) {
       return newColumns
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [width, ListTelesales, configs]
+    [width, ListTelesales, configs, tele, ky_thuat]
   )
 
   const handleEndReached = () => {

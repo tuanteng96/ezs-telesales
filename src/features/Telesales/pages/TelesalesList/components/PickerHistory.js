@@ -6,7 +6,6 @@ import Skeleton from 'react-loading-skeleton'
 import telesalesApi from 'src/api/telesales.api'
 import { AssetsHelpers } from 'src/helpers/AssetsHelpers'
 import Swal from 'sweetalert2'
-import { useSelector } from 'react-redux'
 import * as Yup from 'yup'
 import Text from 'react-texty'
 
@@ -14,6 +13,7 @@ import moment from 'moment'
 import 'moment/locale/vi'
 import { Formik, Form } from 'formik'
 import SelectTeleHis from 'src/components/Selects/SelectTeleHis'
+import { useRoles } from 'src/hooks/useRoles'
 
 moment.locale('vi')
 
@@ -34,9 +34,7 @@ function PickerHistory({ children, data, onRefresh }) {
   const [btnLoading, setBtnLoading] = useState(false)
   const [List, setList] = useState([])
 
-  const { teleAdv } = useSelector(({ auth }) => ({
-    teleAdv: auth?.Info?.rightsSum?.teleAdv || false
-  }))
+  const { ky_thuat, tele } = useRoles(['ky_thuat', 'tele'])
 
   useEffect(() => {
     if (MemberID && visible) {
@@ -147,7 +145,11 @@ function PickerHistory({ children, data, onRefresh }) {
 
   return (
     <>
-      <div onClick={() => setVisible(true)}>
+      <div
+        onClick={() =>
+          (!ky_thuat.hasRight || tele.hasRight) && setVisible(true)
+        }
+      >
         {List.length > 0 || (data.TopTele && data.TopTele.length > 0) ? (
           <>
             {List.length > 0 ? (
@@ -341,17 +343,12 @@ function PickerHistory({ children, data, onRefresh }) {
                         <span className="font-number fw-500">
                           {moment(item.CreateDate).format('HH:mm DD-MM-YYYY')}
                         </span>
-
-                        {(teleAdv ||
-                          moment(item.CreateDate).format('DD-MM-YYYY') ===
-                            moment().format('DD-MM-YYYY')) && (
-                          <span
-                            className="fw-500 text-danger cursor-pointer text-underline font-size-sm"
-                            onClick={() => onDelete(item)}
-                          >
-                            Xóa
-                          </span>
-                        )}
+                        <span
+                          className="fw-500 text-danger cursor-pointer text-underline font-size-sm"
+                          onClick={() => onDelete(item)}
+                        >
+                          Xóa
+                        </span>
                       </div>
                       {item.Result && (
                         <div className="mt-8px fw-500">
