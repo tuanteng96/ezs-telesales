@@ -386,6 +386,7 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                       </div>
                     </div>
                   </div>
+<<<<<<< Updated upstream
                   {nang_cao.hasRight && (
                     <div className="form-group mb-15px">
                       <label className="font-label text-muted mb-5px">
@@ -405,6 +406,27 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                       />
                     </div>
                   )}
+=======
+
+                  <div className="form-group mb-15px">
+                    <label className="font-label text-muted mb-5px">
+                      Sale phụ trách
+                    </label>
+                    <SelectStaffs
+                      adv={true}
+                      className="select-control"
+                      menuPosition="fixed"
+                      menuPlacement="top"
+                      name="filter.tele_user_id"
+                      onChange={otp => {
+                        setFieldValue('filter.tele_user_id', otp, false)
+                      }}
+                      value={values.filter.tele_user_id}
+                      isClearable={true}
+                    />
+                  </div>
+
+>>>>>>> Stashed changes
                   <div className="form-group mb-15px">
                     <label className="font-label text-muted mb-5px">
                       Support Phụ trách
@@ -506,9 +528,25 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                         onBlur={handleBlur}
                       />
                       <span className="checkbox-icon"></span>
-                      <span className="fw-500 font-label">Cộng tách viên</span>
+                      <span className="fw-500 font-label">Cộng tác viên</span>
                     </label>
                   </div>
+                  <div>
+                    <label className="checkbox d-flex cursor-pointer mt-20px">
+                      <input
+                        type="checkbox"
+                        name="filter.emptyStaff"
+                        value={values.filter.emptyStaff}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                      />
+                      <span className="checkbox-icon"></span>
+                      <span className="fw-500 font-label">
+                        Chưa chọn nhân viên
+                      </span>
+                    </label>
+                  </div>
+<<<<<<< Updated upstream
 
                   {nang_cao.hasRight && (
                     <div>
@@ -546,6 +584,8 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                       </label>
                     </div>
                   )}
+=======
+>>>>>>> Stashed changes
                 </div>
                 <div className="border-top p-15px d-flex">
                   <button
