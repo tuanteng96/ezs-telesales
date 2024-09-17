@@ -135,6 +135,15 @@ function StatisticalList(props) {
           align: 'center'
         },
         {
+          key: 'CreateDate',
+          title: 'Ngày tạo',
+          dataKey: 'CreateDate',
+          cellRenderer: ({ rowData }) =>
+            moment(rowData.CreateDate).format('DD-MM-YYYY'),
+          width: 120,
+          sortable: false
+        },
+        {
           key: 'MemberName',
           title: 'Họ tên khách hàng',
           dataKey: 'MemberName',
