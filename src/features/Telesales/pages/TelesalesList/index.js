@@ -26,6 +26,7 @@ import PickerContract from './components/PickerContract'
 import PickerPoint from './components/PickerPoint'
 import clsx from 'clsx'
 import { useRoles } from 'src/hooks/useRoles'
+import PickerPartner from './components/PickerPartner'
 
 moment.locale('vi')
 
@@ -1579,6 +1580,30 @@ function TelesalesList(props) {
             ></PickerContract>
           )
         },
+        {
+          key: 'PartnerJSON',
+          title: 'Nhân viên',
+          dataKey: 'PartnerJSON',
+          width: 180,
+          sortable: false,
+          cellRenderer: ({ rowData, container }) => (
+            <PickerPartner rowData={rowData} onRefresh={onRefresh}>
+              {({ open }) => (
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={open}
+                >
+                  Nhân viên (
+                  {rowData.PartnerJSON
+                    ? JSON.parse(rowData.PartnerJSON).length
+                    : 0}
+                  )
+                </button>
+              )}
+            </PickerPartner>
+          )
+        }
         // {
         //   key: 'PointJSON',
         //   title: 'Tích điểm',

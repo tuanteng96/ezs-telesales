@@ -92,6 +92,8 @@ const telesalesApi = {
     return http.post('/api/v3/member25@ActivityReport', JSON.stringify(data))
   },
   callNow: data =>
-    http.post('/api/third/SBPhonePA@CallNow', JSON.stringify(data))
+    http.post('/api/third/SBPhonePA@CallNow', JSON.stringify(data)),
+  updateUserPartner: data =>
+    http.post('/api/v3/userpartner@edit', JSON.stringify(data))
 }
 export default telesalesApi
