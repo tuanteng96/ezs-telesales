@@ -16,6 +16,8 @@ import { NumericFormat } from 'react-number-format'
 import { useMutation } from '@tanstack/react-query'
 import { PriceHelper } from 'src/helpers/PriceHelper'
 import { useRoles } from 'src/hooks/useRoles'
+import moreApi from 'src/api/more.api'
+import SelectStaffs from 'src/components/Selects/SelectStaffs'
 
 moment.locale('vi')
 
@@ -23,6 +25,207 @@ const AddNotiSchema = Yup.object().shape({
   CreateDate: Yup.string().required('Ngày tạo trống'),
   EndDate: Yup.string().required('Ngày hết hạn trống')
 })
+
+const PickerPayed = ({
+  children,
+  List,
+  item,
+  index,
+  rowData,
+  onRefresh,
+  setList
+}) => {
+  const [visible, setVisible] = useState(false)
+
+  const updateMutation = useMutation({
+    mutationFn: async body => {
+      const newData = {
+        arr: [
+          {
+            ID: rowData.ID,
+            ContractJSON: body?.ContractJSON
+              ? JSON.stringify(body.ContractJSON)
+              : ''
+          }
+        ]
+      }
+      let { data } = await telesalesApi.updateMemberIDTelesales(newData)
+
+      return data
+    }
+  })
+
+  const onSubmit = values => {
+    let newItem = {
+      ...item,
+      CreateDate: item.CreateDate
+        ? moment(item.CreateDate).format('HH:mm YYYY-MM-DD')
+        : ''
+    }
+    if (item?.Payments) {
+      newItem.Payments.push(values)
+    } else {
+      newItem.Payments = [values]
+    }
+
+    let newList = [...List]
+
+    newList[index] = newItem
+
+    updateMutation.mutate(
+      {
+        ContractJSON: newList
+      },
+      {
+        onSuccess: ({ lst }) => {
+          onRefresh()
+          setVisible(false)
+
+          if (lst && lst.length > 0) {
+            const ListsNews = lst[0].ContractJSON
+              ? JSON.parse(lst[0].ContractJSON)
+              : []
+            setList(ListsNews)
+          }
+        }
+      }
+    )
+  }
+
+  return (
+    <>
+      {children({ open: () => setVisible(true) })}
+      {createPortal(
+        <Modal
+          show={visible}
+          onHide={() => setVisible(false)}
+          dialogClassName="modal-content-right max-w-400px"
+          scrollable={true}
+          enforceFocus={false}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>
+              <div>
+                <div className="fw-600 font-size-lg text-uppercase">
+                  Thanh toán
+                </div>
+              </div>
+            </Modal.Title>
+          </Modal.Header>
+          <Formik
+            initialValues={{
+              CreateDate: '',
+              Price: '',
+              RosePrice: '',
+              SalesPayment: ''
+            }}
+            onSubmit={onSubmit}
+            enableReinitialize={true}
+          >
+            {formikProps => {
+              const {
+                values,
+                touched,
+                errors,
+                setFieldValue,
+                handleBlur,
+                handleChange
+              } = formikProps
+              return (
+                <Form className="p-15px">
+                  <div
+                    className="mb-15px"
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(1,minmax(0,1fr))',
+                      gap: '1rem'
+                    }}
+                  >
+                    <div className="form-group mb-0">
+                      <label>Ngày</label>
+                      <DatePicker
+                        name="CreateDate"
+                        onChange={date => {
+                          setFieldValue('CreateDate', date, false)
+                        }}
+                        selected={values.CreateDate}
+                        placeholderText="Chọn ngày"
+                        className={`form-control ${
+                          errors?.CreateDate && touched?.CreateDate
+                            ? 'is-invalid solid-invalid'
+                            : ''
+                        }`}
+                        dateFormat="dd/MM/yyyy"
+                        onBlur={handleBlur}
+                        autoComplete="off"
+                        //dateFormatCalendar="MMMM"
+                      />
+                    </div>
+                  </div>
+                  <div className="form-group mb-15px">
+                    <label>Số tiền</label>
+                    <NumericFormat
+                      className="form-control"
+                      allowLeadingZeros={true}
+                      thousandSeparator={true}
+                      value={values.Price}
+                      placeholder="Nhập giá trị"
+                      onValueChange={val => {
+                        setFieldValue('Price', val.floatValue || '', false)
+                      }}
+                    />
+                  </div>
+                  <div className="form-group mb-15px">
+                    <label>Sale thanh toán</label>
+                    <SelectStaffs
+                      adv={true}
+                      className="select-control"
+                      menuPosition="fixed"
+                      menuPlacement="top"
+                      name="SalesPayment"
+                      onChange={otp => {
+                        setFieldValue('SalesPayment', otp, false)
+                      }}
+                      value={values.SalesPayment}
+                      isClearable={true}
+                    />
+                  </div>
+                  <div className="form-group mb-15px">
+                    <label>Hoa hồng</label>
+                    <NumericFormat
+                      className="form-control"
+                      allowLeadingZeros={true}
+                      thousandSeparator={true}
+                      value={values.RosePrice}
+                      placeholder="Nhập giá trị"
+                      onValueChange={val => {
+                        setFieldValue('RosePrice', val.floatValue || '', false)
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <button
+                      type="submit"
+                      className={clsx(
+                        'btn btn-success w-100',
+                        updateMutation.isPending &&
+                          'spinner spinner-white spinner-right'
+                      )}
+                      disabled={updateMutation.isPending}
+                    >
+                      Thêm mới
+                    </button>
+                  </div>
+                </Form>
+              )
+            }}
+          </Formik>
+        </Modal>,
+        document.body
+      )}
+    </>
+  )
+}
 
 function PickerContract({ children, rowData, onRefresh }) {
   const [visible, setVisible] = useState()
@@ -129,6 +332,61 @@ function PickerContract({ children, rowData, onRefresh }) {
     })
   }
 
+  const onDeleteSub = (index, idx) => {
+    let newLists = [...List]
+    newLists[index].Payments.splice(idx, 1)
+    Swal.fire({
+      title: 'Thực hiện xóa ?',
+      html: `Bạn đang thực hiện lần thanh toán này.`,
+      showCancelButton: true,
+      confirmButtonText: 'Xóa ngay',
+      cancelButtonText: 'Hủy',
+      showLoaderOnConfirm: true,
+      customClass: {
+        confirmButton: 'bg-danger'
+      },
+      preConfirm: () =>
+        new Promise((resolve, reject) => {
+          newLists[index].Payments.splice(idx, 1)
+          updateMutation.mutate(
+            {
+              ContractJSON: newLists
+            },
+            {
+              onSuccess: ({ lst }) => {
+                onRefresh()
+                if (lst && lst.length > 0) {
+                  const ListsNews = lst[0].ContractJSON
+                    ? JSON.parse(lst[0].ContractJSON)
+                    : []
+                  setList(ListsNews)
+                  resolve()
+                }
+              }
+            }
+          )
+        }),
+      allowOutsideClick: () => !Swal.isLoading()
+    })
+  }
+
+  const uploadMutation = useMutation({
+    mutationFn: async body => {
+      let { data } = await moreApi.uploadFile(body)
+      return data
+    }
+  })
+
+  const handleChangeFiles = (file, setFieldValue) => {
+    var bodyFormData = new FormData()
+    bodyFormData.append('file', file[0])
+    uploadMutation.mutate(bodyFormData, {
+      onSuccess: data => {
+        setFieldValue('ContractFile', data.data)
+      }
+    })
+  }
+
   return (
     <>
       <div className="cursor-pointer" onClick={() => setVisible(true)}>
@@ -230,6 +488,28 @@ function PickerContract({ children, rowData, onRefresh }) {
                           </span>
                         </div>
                         <div>
+                          Cơ sở :
+                          <span className="pl-5px fw-600 text-danger">
+                            {item?.CountStock || 1}
+                          </span>
+                        </div>
+                        {item.ContractFile && (
+                          <div>
+                            Files hợp đồng :
+                            <a
+                              href={AssetsHelpers.toUrlServer(
+                                `/upload/image/${item.ContractFile}`
+                              )}
+                              className="pl-5px fw-600 text-primary"
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Xem file hợp đồng
+                            </a>
+                          </div>
+                        )}
+
+                        <div>
                           Nội dung :
                           <span className="pl-5px fw-500">
                             {item.Content || 'Không'}
@@ -241,6 +521,79 @@ function PickerContract({ children, rowData, onRefresh }) {
                             {item.Note || 'Không'}
                           </span>
                         </div>
+
+                        {item.Payments && item.Payments.length > 0 && (
+                          <div className="border-top pt-10px mt-10px">
+                            <div className="fw-600">Lịch sử thanh toán</div>
+                            <div>
+                              {item.Payments &&
+                                item.Payments.map((item, idx) => (
+                                  <div
+                                    className="border mt-12px rounded p-12px position-relative"
+                                    key={idx}
+                                  >
+                                    <div>
+                                      Ngày :
+                                      <span className="fw-600 pl-3px">
+                                        {moment(item.CreateDate).format(
+                                          'HH:mm DD-MM-YYYY'
+                                        )}
+                                      </span>
+                                    </div>
+                                    <div>
+                                      Số tiền :
+                                      <span className="fw-600 pl-3px">
+                                        {PriceHelper.formatVND(item.Price)}
+                                      </span>
+                                    </div>
+                                    <div>
+                                      Hoa hồng :
+                                      <span className="fw-600 pl-3px">
+                                        {PriceHelper.formatVND(item.RosePrice)}
+                                      </span>
+                                    </div>
+                                    <div>
+                                      Sale thanh toán :
+                                      <span className="fw-600 pl-3px">
+                                        {item?.SalesPayment?.text}
+                                      </span>
+                                    </div>
+                                    {(tele?.hasRight ||
+                                      (!ky_thuat.hasRight &&
+                                        nang_cao.hasRight)) && (
+                                      <div
+                                        className="text-danger border position-absolute bg-white right-20px top-20px w-40px h-40px d-flex justify-content-center align-items-center rounded-circle cursor-pointer"
+                                        onClick={() => onDeleteSub(index, idx)}
+                                      >
+                                        <i className="far fa-trash-alt"></i>
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                            </div>
+                          </div>
+                        )}
+
+                        <PickerPayed
+                          List={List}
+                          item={item}
+                          index={index}
+                          rowData={rowData}
+                          onRefresh={onRefresh}
+                          setList={setList}
+                        >
+                          {({ open }) => (
+                            <div className="mt-12px">
+                              <button
+                                type="button"
+                                className="btn btn-success"
+                                onClick={open}
+                              >
+                                Thanh toán
+                              </button>
+                            </div>
+                          )}
+                        </PickerPayed>
                       </div>
                     ))}
                   </div>
@@ -274,7 +627,9 @@ function PickerContract({ children, rowData, onRefresh }) {
                     Type: {
                       label: 'Ký mới',
                       value: 'Ký mới'
-                    }
+                    },
+                    CountStock: '',
+                    ContractFile: ''
                   }}
                   onSubmit={onSubmit}
                   validationSchema={AddNotiSchema}
@@ -357,6 +712,23 @@ function PickerContract({ children, rowData, onRefresh }) {
                           ></textarea>
                         </div>
                         <div className="form-group mb-15px">
+                          <label>Số cơ sở</label>
+                          <NumericFormat
+                            className="form-control"
+                            allowLeadingZeros={true}
+                            //thousandSeparator={true}
+                            value={values.CountStock}
+                            placeholder="Nhập số cơ sở"
+                            onValueChange={val => {
+                              setFieldValue(
+                                'CountStock',
+                                val.floatValue || '',
+                                false
+                              )
+                            }}
+                          />
+                        </div>
+                        <div className="form-group mb-15px">
                           <label>Giá trị</label>
                           <NumericFormat
                             className="form-control"
@@ -372,6 +744,49 @@ function PickerContract({ children, rowData, onRefresh }) {
                               )
                             }}
                           />
+                        </div>
+                        <div>
+                          <div className="form-group mb-15px">
+                            <label>File hợp đồng</label>
+                            <div className="position-relative d-flex form-control p-0">
+                              <div className="flex-1 d-flex align-items-center px-15px">
+                                {uploadMutation.isPending &&
+                                  'Đang tải file ...'}
+                                {!uploadMutation.isPending && (
+                                  <>
+                                    {values?.ContractFile
+                                      ? values?.ContractFile.split('/')[
+                                          values?.ContractFile.split('/')
+                                            .length - 1
+                                        ]
+                                      : 'Chọn file hợp đồng'}
+                                  </>
+                                )}
+                              </div>
+                              <div
+                                className="d-flex align-items-center px-15px"
+                                style={{
+                                  background: '#e9ecef'
+                                }}
+                              >
+                                Tải files
+                              </div>
+                              <input
+                                className="position-absolute opacity-0 w-100 h-100"
+                                type="file"
+                                id="formFile"
+                                onChange={event =>
+                                  handleChangeFiles(
+                                    event.target.files,
+                                    setFieldValue
+                                  )
+                                }
+                                multiple={false}
+                                value=""
+                                disabled={uploadMutation.isPending}
+                              />
+                            </div>
+                          </div>
                         </div>
                         <div className="form-group mb-15px">
                           <label>Ghi chú</label>

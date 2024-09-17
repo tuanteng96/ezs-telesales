@@ -10,6 +10,8 @@ import 'moment/locale/vi'
 import { useLocation } from 'react-router-dom'
 import { useWindowSize } from 'src/hooks/useWindowSize'
 import { WorkContext } from '../..'
+import { OverlayTrigger, Popover } from 'react-bootstrap'
+import { PriceHelper } from 'src/helpers/PriceHelper'
 
 moment.locale('vi')
 
@@ -164,12 +166,48 @@ function WorkList(props) {
                   rowData.Dates[i].DON_HANG?.TONG_SO
                 ) {
                   return (
-                    <div
-                      className="w-100 h-40px"
-                      style={{
-                        backgroundColor: '#4e9c4e'
-                      }}
-                    ></div>
+                    <OverlayTrigger
+                      trigger="click"
+                      placement="top"
+                      overlay={
+                        <Popover
+                          id="popover-basic"
+                          style={{ minWidth: '250px', width: '250px' }}
+                        >
+                          <Popover.Header as="h3">Thông tin</Popover.Header>
+                          <Popover.Body className="border-0 p-0">
+                            <div className="border-bottom py-8px px-12px d-flex justify-content-between">
+                              <span>Dịch vụ hoàn thành</span>
+                              <span className="fw-600">
+                                {rowData.Dates[i].DICH_VU?.HOAN_THANH}
+                              </span>
+                            </div>
+                            <div className="border-bottom py-8px px-12px d-flex justify-content-between">
+                              <span>Đơn hàng</span>
+                              <span className="fw-600">
+                                {rowData.Dates[i].DON_HANG?.TONG_SO}
+                              </span>
+                            </div>
+                            <div className="py-8px px-12px d-flex justify-content-between">
+                              <span>Tổng giá trị</span>
+                              <span className="fw-600">
+                                {PriceHelper.formatVND(
+                                  rowData.Dates[i].DON_HANG?.TONG_GIA_TRI
+                                )}
+                              </span>
+                            </div>
+                          </Popover.Body>
+                        </Popover>
+                      }
+                      rootClose
+                    >
+                      <div
+                        className="w-100 h-40px"
+                        style={{
+                          backgroundColor: '#4e9c4e'
+                        }}
+                      ></div>
+                    </OverlayTrigger>
                   )
                 } else {
                   return (
@@ -261,6 +299,15 @@ function WorkList(props) {
             </span>
           </div>
           <div className="w-85px w-md-auto d-flex">
+            <button
+              type="button"
+              className="btn btn-primary mr-5px"
+              onClick={() =>
+                window?.top?.ActivityGet && window?.top?.ActivityGet()
+              }
+            >
+              <i className="fa-solid fa-rotate-right"></i>
+            </button>
             <Navbar ExportExcel={ExportExcel} IsLoadingEx={IsLoadingEx} />
             <button
               type="button"

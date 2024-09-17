@@ -1113,15 +1113,7 @@ function TelesalesList(props) {
             visible: true
           },
           {
-            title: 'PDF hợp đồng',
-            visible: true
-          },
-          {
             title: 'Hợp đồng',
-            visible: true
-          },
-          {
-            title: 'Tích điểm',
             visible: true
           }
         ]
@@ -1514,21 +1506,21 @@ function TelesalesList(props) {
             />
           )
         },
-        {
-          key: 'IsCoop',
-          title: 'Cộng tác viên',
-          dataKey: 'IsCoop',
-          width: 150,
-          sortable: false,
-          cellRenderer: ({ rowData, container }) => (
-            <EditableCellIsCoop
-              rowData={rowData}
-              container={container}
-              hideEditing={() => setIsEditing(false)}
-              showEditing={() => setIsEditing(true)}
-            />
-          )
-        },
+        // {
+        //   key: 'IsCoop',
+        //   title: 'Cộng tác viên',
+        //   dataKey: 'IsCoop',
+        //   width: 150,
+        //   sortable: false,
+        //   cellRenderer: ({ rowData, container }) => (
+        //     <EditableCellIsCoop
+        //       rowData={rowData}
+        //       container={container}
+        //       hideEditing={() => setIsEditing(false)}
+        //       showEditing={() => setIsEditing(true)}
+        //     />
+        //   )
+        // },
         {
           key: 'Status',
           title: 'Tình trạng',
@@ -1559,21 +1551,21 @@ function TelesalesList(props) {
             />
           )
         },
-        {
-          key: 'ContractDefault',
-          title: 'PDF hợp đồng',
-          dataKey: 'ContractDefault',
-          width: 220,
-          sortable: false,
-          cellRenderer: ({ rowData, container }) => (
-            <EditableCellPDF
-              rowData={rowData}
-              container={container}
-              hideEditing={() => setIsEditing(false)}
-              showEditing={() => setIsEditing(true)}
-            />
-          )
-        },
+        // {
+        //   key: 'ContractDefault',
+        //   title: 'PDF hợp đồng',
+        //   dataKey: 'ContractDefault',
+        //   width: 220,
+        //   sortable: false,
+        //   cellRenderer: ({ rowData, container }) => (
+        //     <EditableCellPDF
+        //       rowData={rowData}
+        //       container={container}
+        //       hideEditing={() => setIsEditing(false)}
+        //       showEditing={() => setIsEditing(true)}
+        //     />
+        //   )
+        // },
         {
           key: 'ContractJSON',
           title: 'Hợp đồng',
@@ -1587,16 +1579,16 @@ function TelesalesList(props) {
             ></PickerContract>
           )
         },
-        {
-          key: 'PointJSON',
-          title: 'Tích điểm',
-          dataKey: 'PointJSON',
-          width: 250,
-          sortable: false,
-          cellRenderer: ({ rowData, container }) => (
-            <PickerPoint rowData={rowData} onRefresh={onRefresh}></PickerPoint>
-          )
-        }
+        // {
+        //   key: 'PointJSON',
+        //   title: 'Tích điểm',
+        //   dataKey: 'PointJSON',
+        //   width: 250,
+        //   sortable: false,
+        //   cellRenderer: ({ rowData, container }) => (
+        //     <PickerPoint rowData={rowData} onRefresh={onRefresh}></PickerPoint>
+        //   )
+        // }
         // {
         //   key: 'action',
         //   title: '',

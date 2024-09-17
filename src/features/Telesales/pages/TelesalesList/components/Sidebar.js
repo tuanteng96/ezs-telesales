@@ -514,7 +514,7 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                     />
                   </div>
 
-                  <div className="form-group mb-15px">
+                  {/* <div className="form-group mb-15px">
                     <label className="cursor-pointer checkbox d-flex">
                       <input
                         type="checkbox"
@@ -526,7 +526,7 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                       <span className="checkbox-icon"></span>
                       <span className="fw-500 font-label">Cộng tác viên</span>
                     </label>
-                  </div>
+                  </div> */}
 
                   {nang_cao.hasRight && (
                     <div>
