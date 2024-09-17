@@ -527,21 +527,6 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                       <span className="fw-500 font-label">Cộng tác viên</span>
                     </label>
                   </div>
-                  <div>
-                    <label className="cursor-pointer checkbox d-flex mt-20px">
-                      <input
-                        type="checkbox"
-                        name="filter.emptyStaff"
-                        value={values.filter.emptyStaff}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                      />
-                      <span className="checkbox-icon"></span>
-                      <span className="fw-500 font-label">
-                        Chưa chọn nhân viên
-                      </span>
-                    </label>
-                  </div>
 
                   {nang_cao.hasRight && (
                     <div>

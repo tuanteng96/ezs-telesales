@@ -116,7 +116,7 @@ function AuthInit(props) {
           }
         }
         window.top.token =
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBdXRoMlR5cGUiOiJVc2VyRW50IiwiSUQiOiIxIiwiVG9rZW5JZCI6IjE0MTgiLCJuYmYiOjE3MTM4NDIwOTAsImV4cCI6MTcxNDQ0Njg5MCwiaWF0IjoxNzEzODQyMDkwfQ.jrKK5gNv5scV1qmigqFuRXo4Pb9B-A5xft8ypo6Jv2U'
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBdXRoMlR5cGUiOiJVc2VyRW50IiwiSUQiOiIxIiwiVG9rZW5JZCI6IjE0NTEiLCJuYmYiOjE3MjY1NDAwMDIsImV4cCI6MTcyNzE0NDgwMiwiaWF0IjoxNzI2NTQwMDAyfQ.tOe3B6t9FBJF_aSd522eg5kpnadXv0JkK-LYhy9qoFo'
         window.top.GlobalConfig = {
           Admin: {
             kpiSortColumn: [
