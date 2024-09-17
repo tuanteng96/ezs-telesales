@@ -198,7 +198,7 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                     <div className="cursor-pointer position-absolute top-8px right-10px">
                       <Dropdown>
                         <Dropdown.Toggle
-                          className="btn-out cursor-pointer w-40px h-40px d-flex align-items-center justify-content-center bg-white"
+                          className="bg-white cursor-pointer btn-out w-40px h-40px d-flex align-items-center justify-content-center"
                           style={{
                             background: '#fff !important'
                           }}
@@ -226,7 +226,7 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                     </div>
                   )}
                 </div>
-                <div className="flex-grow-1 p-15px overflow-auto">
+                <div className="overflow-auto flex-grow-1 p-15px">
                   <div className="mb-15px form-group">
                     <label className="font-label text-muted">Từ khóa</label>
                     <input
@@ -252,7 +252,7 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                               .fill()
                               .map((x, idx) => (
                                 <label
-                                  className="checkbox d-flex cursor-pointer"
+                                  className="cursor-pointer checkbox d-flex"
                                   key={idx}
                                 >
                                   <input
@@ -281,7 +281,7 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                           {type.Children &&
                             type.Children.map((x, idx) => (
                               <label
-                                className="checkbox d-flex cursor-pointer"
+                                className="cursor-pointer checkbox d-flex"
                                 key={idx}
                               >
                                 <input
@@ -386,7 +386,6 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                       </div>
                     </div>
                   </div>
-<<<<<<< Updated upstream
                   {nang_cao.hasRight && (
                     <div className="form-group mb-15px">
                       <label className="font-label text-muted mb-5px">
@@ -406,7 +405,6 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                       />
                     </div>
                   )}
-=======
 
                   <div className="form-group mb-15px">
                     <label className="font-label text-muted mb-5px">
@@ -425,8 +423,6 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                       isClearable={true}
                     />
                   </div>
-
->>>>>>> Stashed changes
                   <div className="form-group mb-15px">
                     <label className="font-label text-muted mb-5px">
                       Support Phụ trách
@@ -519,7 +515,7 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                   </div>
 
                   <div className="form-group mb-15px">
-                    <label className="checkbox d-flex cursor-pointer">
+                    <label className="cursor-pointer checkbox d-flex">
                       <input
                         type="checkbox"
                         name="filter.IsCoop"
@@ -532,7 +528,7 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                     </label>
                   </div>
                   <div>
-                    <label className="checkbox d-flex cursor-pointer mt-20px">
+                    <label className="cursor-pointer checkbox d-flex mt-20px">
                       <input
                         type="checkbox"
                         name="filter.emptyStaff"
@@ -546,11 +542,10 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                       </span>
                     </label>
                   </div>
-<<<<<<< Updated upstream
 
                   {nang_cao.hasRight && (
                     <div>
-                      <label className="checkbox d-flex cursor-pointer mt-20px">
+                      <label className="cursor-pointer checkbox d-flex mt-20px">
                         <input
                           type="checkbox"
                           name="filter.emptyStaff"
@@ -568,7 +563,7 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                   )}
                   {(!ky_thuat.hasRight || tele.hasRight) && (
                     <div>
-                      <label className="checkbox d-flex cursor-pointer mt-20px">
+                      <label className="cursor-pointer checkbox d-flex mt-20px">
                         <input
                           type="checkbox"
                           name="filter.emptySupport"
@@ -584,8 +579,6 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                       </label>
                     </div>
                   )}
-=======
->>>>>>> Stashed changes
                 </div>
                 <div className="border-top p-15px d-flex">
                   <button
