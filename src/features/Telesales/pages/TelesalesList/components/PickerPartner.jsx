@@ -6,6 +6,7 @@ import { Modal } from 'react-bootstrap'
 import { createPortal } from 'react-dom'
 import telesalesApi from 'src/api/telesales.api'
 import ReactBaseTableInfinite from 'src/components/Tables/ReactBaseTableInfinite'
+import Swal from 'sweetalert2'
 
 const PickerPartnerAdd = ({
   children,
@@ -209,6 +210,49 @@ function PickerPartner({ children, rowData, onRefresh }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible])
 
+  const deleteMutation = useMutation({
+    mutationFn: async body => {
+      let { data } = await telesalesApi.updateUserPartner(body)
+      await new Promise(resolve => {
+        onRefresh(() => resolve())
+      })
+      return data
+    }
+  })
+
+  const onDelete = item => {
+    let newValues = [...Lists]
+    newValues = newValues.filter(x => x.ID !== item.ID)
+
+    let dataPost = {
+      MemberID: MemberID,
+      UserPartnerID: -1,
+      PartnerList: newValues
+    }
+
+    Swal.fire({
+      title: 'Thực hiện xóa ?',
+      html: `Bạn đang thực hiện xóa nhân viên này.`,
+      showCancelButton: true,
+      confirmButtonText: 'Xóa ngay',
+      cancelButtonText: 'Hủy',
+      showLoaderOnConfirm: true,
+      customClass: {
+        confirmButton: 'bg-danger'
+      },
+      preConfirm: () =>
+        new Promise((resolve, reject) => {
+          deleteMutation.mutate(dataPost, {
+            onSuccess: (data) => {
+              setLists(data?.UpdateList)
+              resolve()
+            }
+          })
+        }),
+      allowOutsideClick: () => !Swal.isLoading()
+    })
+  }
+
   const columns = useMemo(
     () => [
       {
@@ -222,14 +266,14 @@ function PickerPartner({ children, rowData, onRefresh }) {
         key: 'Phone',
         title: 'Số điện thoại',
         dataKey: 'Phone',
-        width: 180,
+        width: 150,
         sortable: false
       },
       {
         key: 'Spa',
         title: 'Spa',
         dataKey: 'Spa',
-        width: 180,
+        width: 220,
         sortable: false
       },
       {
@@ -253,22 +297,35 @@ function PickerPartner({ children, rowData, onRefresh }) {
         key: 'action',
         title: '#',
         dataKey: 'action',
-        width: 60,
+        width: 130,
         sortable: false,
-        cellRenderer: ({ rowData, container }) => (
-          <PickerPartnerAdd
-            rowData={rowData}
-            Lists={Lists}
-            MemberID={MemberID}
-            setLists={setLists}
-            onRefresh={onRefresh}
-          >
-            {({ open }) => (
-              <button type="button" className="btn btn-success" onClick={open}>
-                <i className="fas fa-pencil-alt"></i>
-              </button>
-            )}
-          </PickerPartnerAdd>
+        cellRenderer: ({ rowData }) => (
+          <div className="w-100 d-flex justify-content-center">
+            <PickerPartnerAdd
+              rowData={rowData}
+              Lists={Lists}
+              MemberID={MemberID}
+              setLists={setLists}
+              onRefresh={onRefresh}
+            >
+              {({ open }) => (
+                <button
+                  type="button"
+                  className="btn btn-success"
+                  onClick={open}
+                >
+                  <i className="fas fa-pencil-alt"></i>
+                </button>
+              )}
+            </PickerPartnerAdd>
+            <button
+              type="button"
+              className="btn btn-danger ml-8px"
+              onClick={() => onDelete(rowData)}
+            >
+              <i className="fas fa-trash-alt"></i>
+            </button>
+          </div>
         ),
         headerClassName: 'justify-content-center',
         frozen: 'right'

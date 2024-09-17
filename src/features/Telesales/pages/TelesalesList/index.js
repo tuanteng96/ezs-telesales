@@ -1584,7 +1584,7 @@ function TelesalesList(props) {
           key: 'PartnerJSON',
           title: 'Nhân viên',
           dataKey: 'PartnerJSON',
-          width: 180,
+          width: 150,
           sortable: false,
           cellRenderer: ({ rowData, container }) => (
             <PickerPartner rowData={rowData} onRefresh={onRefresh}>
