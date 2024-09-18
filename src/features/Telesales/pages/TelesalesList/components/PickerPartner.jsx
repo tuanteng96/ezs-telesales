@@ -48,10 +48,16 @@ const PickerPartnerAdd = ({
     if (values?.ID > -1) {
       let index = newValues.findIndex(x => x.ID === values?.ID)
       if (index > -1) {
-        newValues[index] = values
+        newValues[index] = {
+          ...values,
+          Status: values.Status ? 'DA_TIEP_CAN' : ''
+        }
       }
     } else {
-      newValues.push(values)
+      newValues.push({
+        ...values,
+        Status: values.Status ? 'DA_TIEP_CAN' : ''
+      })
     }
 
     let dataPost = {
@@ -243,7 +249,7 @@ function PickerPartner({ children, rowData, onRefresh }) {
       preConfirm: () =>
         new Promise((resolve, reject) => {
           deleteMutation.mutate(dataPost, {
-            onSuccess: (data) => {
+            onSuccess: data => {
               setLists(data?.UpdateList)
               resolve()
             }
@@ -259,7 +265,7 @@ function PickerPartner({ children, rowData, onRefresh }) {
         key: 'FullName',
         title: 'Họ và tên',
         dataKey: 'FullName',
-        width: 220,
+        width: 250,
         sortable: false
       },
       {
@@ -273,7 +279,7 @@ function PickerPartner({ children, rowData, onRefresh }) {
         key: 'Spa',
         title: 'Spa',
         dataKey: 'Spa',
-        width: 220,
+        width: 250,
         sortable: false
       },
       {
@@ -283,14 +289,14 @@ function PickerPartner({ children, rowData, onRefresh }) {
         width: 180,
         sortable: false,
         cellRenderer: ({ rowData }) => (
-          <div>{rowData?.Status ? 'Đã tiếp cận' : ''}</div>
+          <div>{rowData?.Status === 'DA_TIEP_CAN' ? 'Đã tiếp cận' : ''}</div>
         )
       },
       {
         key: 'Desc',
         title: 'Ghi chú',
         dataKey: 'Desc',
-        width: 250,
+        width: 300,
         sortable: false
       },
       {
@@ -344,7 +350,7 @@ function PickerPartner({ children, rowData, onRefresh }) {
         <Modal
           show={visible}
           onHide={() => setVisible(false)}
-          dialogClassName="modal-content-right max-w-80"
+          dialogClassName="modal-content-right max-w-70"
           scrollable={true}
           enforceFocus={false}
           contentClassName="d-flex flex-column"

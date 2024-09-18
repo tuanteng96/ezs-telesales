@@ -387,6 +387,12 @@ function PickerContract({ children, rowData, onRefresh }) {
     })
   }
 
+  let isExpired = item => {
+    let EndDate = moment(item.EndDate, 'HH:mm YYYY-MM-DD')
+    let ToDate = moment(moment().format('HH:mm YYYY-MM-DD'), 'HH:mm YYYY-MM-DD')
+    return EndDate.diff(ToDate, 'minutes') < 0
+  }
+
   return (
     <>
       <div className="cursor-pointer" onClick={() => setVisible(true)}>
@@ -458,70 +464,76 @@ function PickerContract({ children, rowData, onRefresh }) {
                             <i className="far fa-trash-alt"></i>
                           </div>
                         )}
-
                         <div>
-                          Ngày tạo :
-                          <span className="pl-5px fw-600">
-                            {moment(item.CreateDate, 'HH:mm YYYY-MM-DD').format(
-                              'DD-MM-YYYY'
-                            )}
-                          </span>
-                        </div>
-                        <div>
-                          Hạn sử dụng :
-                          <span className="pl-5px fw-600 text-danger">
-                            {moment(item.EndDate, 'HH:mm YYYY-MM-DD').format(
-                              'DD-MM-YYYY'
-                            )}
-                          </span>
-                        </div>
-                        <div>
-                          Loại :
-                          <span className="pl-5px fw-600">
-                            {item?.Type || 'Không'}
-                          </span>
-                        </div>
-                        <div>
-                          Giá trị :
-                          <span className="pl-5px fw-600 text-danger">
-                            {PriceHelper.formatVND(item?.Price)}
-                          </span>
-                        </div>
-                        <div>
-                          Cơ sở :
-                          <span className="pl-5px fw-600 text-danger">
-                            {item?.CountStock || 1}
-                          </span>
-                        </div>
-                        {item.ContractFile && (
                           <div>
-                            Files hợp đồng :
-                            <a
-                              href={AssetsHelpers.toUrlServer(
-                                `/upload/image/${item.ContractFile}`
-                              )}
-                              className="pl-5px fw-600 text-primary"
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              Xem file hợp đồng
-                            </a>
+                            Ngày tạo :
+                            <span className="pl-5px fw-600">
+                              {moment(
+                                item.CreateDate,
+                                'HH:mm YYYY-MM-DD'
+                              ).format('DD-MM-YYYY')}
+                            </span>
+                            {isExpired(item) && (
+                              <span className="pl-5px fw-600 text-danger">
+                                - Hết hạn
+                              </span>
+                            )}
                           </div>
-                        )}
+                          <div>
+                            Hạn sử dụng :
+                            <span className="pl-5px fw-600 text-danger">
+                              {moment(item.EndDate, 'HH:mm YYYY-MM-DD').format(
+                                'DD-MM-YYYY'
+                              )}
+                            </span>
+                          </div>
+                          <div>
+                            Loại :
+                            <span className="pl-5px fw-600">
+                              {item?.Type || 'Không'}
+                            </span>
+                          </div>
+                          <div>
+                            Giá trị :
+                            <span className="pl-5px fw-600 text-danger">
+                              {PriceHelper.formatVND(item?.Price)}
+                            </span>
+                          </div>
+                          <div>
+                            Cơ sở :
+                            <span className="pl-5px fw-600 text-danger">
+                              {item?.CountStock || 1}
+                            </span>
+                          </div>
+                          {item.ContractFile && (
+                            <div>
+                              Files hợp đồng :
+                              <a
+                                href={AssetsHelpers.toUrlServer(
+                                  `/upload/image/${item.ContractFile}`
+                                )}
+                                className="pl-5px fw-600 text-primary"
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                Xem file hợp đồng
+                              </a>
+                            </div>
+                          )}
 
-                        <div>
-                          Nội dung :
-                          <span className="pl-5px fw-500">
-                            {item.Content || 'Không'}
-                          </span>
+                          <div>
+                            Nội dung :
+                            <span className="pl-5px fw-500">
+                              {item.Content || 'Không'}
+                            </span>
+                          </div>
+                          <div>
+                            Ghi chú :
+                            <span className="pl-5px fw-500">
+                              {item.Note || 'Không'}
+                            </span>
+                          </div>
                         </div>
-                        <div>
-                          Ghi chú :
-                          <span className="pl-5px fw-500">
-                            {item.Note || 'Không'}
-                          </span>
-                        </div>
-
                         {item.Payments && item.Payments.length > 0 && (
                           <div className="border-top pt-10px mt-10px">
                             <div className="fw-600">Lịch sử thanh toán</div>

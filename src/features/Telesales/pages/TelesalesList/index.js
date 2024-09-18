@@ -27,6 +27,7 @@ import PickerPoint from './components/PickerPoint'
 import clsx from 'clsx'
 import { useRoles } from 'src/hooks/useRoles'
 import PickerPartner from './components/PickerPartner'
+import { PriceHelper } from 'src/helpers/PriceHelper'
 
 moment.locale('vi')
 
@@ -1290,6 +1291,58 @@ function TelesalesList(props) {
   //     })
   // }
 
+  const getTotalDebt = rowData => {
+    let obj = {
+      ContractValue: 0,
+      ContractPaid: 0,
+      ContractDebt: 0
+    }
+    if (rowData.ContractJSON) {
+      let newPartner = JSON.parse(rowData.ContractJSON)
+      newPartner = newPartner.map(x => ({
+        ...x,
+        TotalPayments:
+          x.Payments && x.Payments.length > 0
+            ? x.Payments.reduce((prev, next) => prev + (next?.Price || 0), 0)
+            : 0
+      }))
+      let ContractValue = newPartner.reduce(
+        (prev, next) => prev + (next?.Price || 0),
+        0
+      )
+      let ContractPaid = newPartner.reduce(
+        (prev, next) => prev + (next?.TotalPayments || 0),
+        0
+      )
+      obj = {
+        ContractValue: ContractValue,
+        ContractPaid: ContractPaid,
+        ContractDebt: ContractValue - ContractPaid
+      }
+    }
+    return obj
+  }
+
+  const getTotalStocks = rowData => {
+    if (rowData.ContractJSON) {
+      let newPartner = JSON.parse(rowData.ContractJSON)
+      newPartner = newPartner.filter(x => {
+        let EndDate = moment(x.EndDate, 'HH:mm YYYY-MM-DD')
+        let ToDate = moment(
+          moment().format('HH:mm YYYY-MM-DD'),
+          'HH:mm YYYY-MM-DD'
+        )
+        return EndDate.diff(ToDate, 'minutes') >= 0
+      })
+      return newPartner.reduce(
+        (prev, next) => prev + (next?.CountStock || 0),
+        0
+      )
+    } else {
+      return 0
+    }
+  }
+
   const columns = useMemo(
     () => {
       let newColumns = [
@@ -1352,6 +1405,28 @@ function TelesalesList(props) {
             //   hideEditing={() => setIsEditing(false)}
             //   showEditing={() => setIsEditing(true)}
             // />
+          )
+        },
+        {
+          key: 'StockCount',
+          title: 'Tổng cơ sở',
+          dataKey: 'StockCount',
+          width: 120,
+          sortable: false,
+          cellRenderer: ({ rowData, container }) => (
+            <div>{getTotalStocks(rowData)}</div>
+          )
+        },
+        {
+          key: 'TotalDebt',
+          title: 'Tổng nợ',
+          dataKey: 'TotalDebt',
+          width: 150,
+          sortable: false,
+          cellRenderer: ({ rowData, container }) => (
+            <div>
+              {PriceHelper.formatVND(getTotalDebt(rowData).ContractDebt)}
+            </div>
           )
         },
         {
