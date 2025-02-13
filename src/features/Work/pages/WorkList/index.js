@@ -158,7 +158,19 @@ function WorkList(props) {
             dataKey: value.Date,
             cellRenderer: ({ rowData }) => {
               if (!rowData.Dates[i].DICH_VU && !rowData.Dates[i].DON_HANG)
-                return <></>
+                return (
+                  <div
+                    className="w-100 h-100"
+                    onClick={() => {
+                      window.top.rowEventHandlers &&
+                        window.top.rowEventHandlers({
+                          rowData,
+                          rowItems: rowData.Dates[i],
+                          onRefresh
+                        })
+                    }}
+                  ></div>
+                )
               if (rowData.Dates[i].DICH_VU || rowData.Dates[i].DON_HANG) {
                 if (
                   rowData.Dates[i].DICH_VU?.HOAN_THANH ||
@@ -166,57 +178,105 @@ function WorkList(props) {
                   rowData.Dates[i].DON_HANG?.TONG_SO
                 ) {
                   return (
-                    <OverlayTrigger
-                      trigger="click"
-                      placement="top"
-                      overlay={
-                        <Popover
-                          id="popover-basic"
-                          style={{ minWidth: '250px', width: '250px' }}
-                        >
-                          <Popover.Header as="h3">Thông tin</Popover.Header>
-                          <Popover.Body className="border-0 p-0">
-                            <div className="border-bottom py-8px px-12px d-flex justify-content-between">
-                              <span>Dịch vụ hoàn thành</span>
-                              <span className="fw-600">
-                                {rowData.Dates[i].DICH_VU?.HOAN_THANH}
-                              </span>
-                            </div>
-                            <div className="border-bottom py-8px px-12px d-flex justify-content-between">
-                              <span>Đơn hàng</span>
-                              <span className="fw-600">
-                                {rowData.Dates[i].DON_HANG?.TONG_SO}
-                              </span>
-                            </div>
-                            <div className="py-8px px-12px d-flex justify-content-between">
-                              <span>Tổng giá trị</span>
-                              <span className="fw-600">
-                                {PriceHelper.formatVND(
-                                  rowData.Dates[i].DON_HANG?.TONG_GIA_TRI
-                                )}
-                              </span>
-                            </div>
-                          </Popover.Body>
-                        </Popover>
-                      }
-                      rootClose
+                    <div
+                      className="w-100 h-100 px-3 d-flex align-items-center"
+                      onClick={() => {
+                        window.top.rowEventHandlers &&
+                          window.top.rowEventHandlers({
+                            rowData,
+                            rowItems: rowData.Dates[i],
+                            onRefresh
+                          })
+                      }}
                     >
-                      <div
-                        className="w-100 h-40px"
-                        style={{
-                          backgroundColor: '#4e9c4e'
-                        }}
-                      ></div>
-                    </OverlayTrigger>
+                      <OverlayTrigger
+                        trigger="click"
+                        placement="top"
+                        overlay={
+                          <Popover
+                            id="popover-basic"
+                            style={{ minWidth: '250px', width: '250px' }}
+                          >
+                            <Popover.Header as="h3">Thông tin</Popover.Header>
+                            <Popover.Body className="border-0 p-0">
+                              <div className="border-bottom py-8px px-12px d-flex justify-content-between">
+                                <span>Dịch vụ hoàn thành</span>
+                                <span className="fw-600">
+                                  {rowData.Dates[i].DICH_VU?.HOAN_THANH}
+                                </span>
+                              </div>
+                              <div className="border-bottom py-8px px-12px d-flex justify-content-between">
+                                <span>Đơn hàng</span>
+                                <span className="fw-600">
+                                  {rowData.Dates[i].DON_HANG?.TONG_SO}
+                                </span>
+                              </div>
+                              <div className="py-8px px-12px d-flex justify-content-between">
+                                <span>Tổng giá trị</span>
+                                <span className="fw-600">
+                                  {PriceHelper.formatVND(
+                                    rowData.Dates[i].DON_HANG?.TONG_GIA_TRI
+                                  )}
+                                </span>
+                              </div>
+                            </Popover.Body>
+                          </Popover>
+                        }
+                        rootClose
+                      >
+                        <div
+                          className="w-100 h-40px"
+                          style={{
+                            backgroundColor: '#4e9c4e',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <span
+                            style={{
+                              color: 'white',
+                              fontSize: '12px',
+                              display: 'block',
+                              padding: '2px 5px'
+                            }}
+                          >
+                            {rowData.Dates[i]?.Text}
+                          </span>
+                        </div>
+                      </OverlayTrigger>
+                    </div>
                   )
                 } else {
                   return (
                     <div
-                      className="w-100 h-40px"
-                      style={{
-                        backgroundColor: '#f64e60'
+                      className="w-100 h-100 px-3 d-flex align-items-center"
+                      onClick={() => {
+                        window.top.rowEventHandlers &&
+                          window.top.rowEventHandlers({
+                            rowData,
+                            rowItems: rowData.Dates[i],
+                            onRefresh
+                          })
                       }}
-                    ></div>
+                    >
+                      <div
+                        className="w-100 h-40px"
+                        style={{
+                          backgroundColor: '#f64e60',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <span
+                          style={{
+                            color: 'white',
+                            fontSize: '12px',
+                            display: 'block',
+                            padding: '2px 5px'
+                          }}
+                        >
+                          {rowData.Dates[i]?.Text}
+                        </span>
+                      </div>
+                    </div>
                   )
                 }
               }
@@ -225,7 +285,9 @@ function WorkList(props) {
             sortable: false,
             className: ({ rowData }) =>
               moment(rowData.Dates[i].Date).format('DD-MM-YYYY') ===
-                moment().format('DD-MM-YYYY') && 'bg-light-waring',
+              moment().format('DD-MM-YYYY')
+                ? 'bg-light-waring p-0'
+                : 'p-0',
             headerClassName: ({ column }) =>
               column.title === moment().format('DD-MM-YYYY') &&
               'bg-light-waring'
