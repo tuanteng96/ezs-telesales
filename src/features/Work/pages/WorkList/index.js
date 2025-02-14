@@ -236,7 +236,8 @@ function WorkList(props) {
                               color: 'white',
                               fontSize: '12px',
                               display: 'block',
-                              padding: '2px 5px'
+                              padding: '2px 5px',
+                              wordBreak: 'break-word'
                             }}
                           >
                             {rowData.Dates[i]?.Text}
