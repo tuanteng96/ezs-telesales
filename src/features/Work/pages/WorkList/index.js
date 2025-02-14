@@ -161,7 +161,7 @@ function WorkList(props) {
                 return (
                   <div
                     className="w-100 h-100"
-                    onClick={() => {
+                    onClick={event => {
                       window.top.rowEventHandlers &&
                         window.top.rowEventHandlers({
                           rowData,
@@ -178,17 +178,7 @@ function WorkList(props) {
                   rowData.Dates[i].DON_HANG?.TONG_SO
                 ) {
                   return (
-                    <div
-                      className="w-100 h-100 px-3 d-flex align-items-center"
-                      onClick={() => {
-                        window.top.rowEventHandlers &&
-                          window.top.rowEventHandlers({
-                            rowData,
-                            rowItems: rowData.Dates[i],
-                            onRefresh
-                          })
-                      }}
-                    >
+                    <div className="w-100 h-100 px-3 d-flex align-items-center">
                       <OverlayTrigger
                         trigger="click"
                         placement="top"
@@ -220,6 +210,25 @@ function WorkList(props) {
                                 </span>
                               </div>
                             </Popover.Body>
+                            <div
+                              className="py-8px px-12px"
+                              onClick={event => {
+                                window.top.rowEventHandlers &&
+                                  window.top.rowEventHandlers({
+                                    rowData,
+                                    rowItems: rowData.Dates[i],
+                                    onRefresh,
+                                    event
+                                  })
+                              }}
+                            >
+                              <button
+                                type="button"
+                                className="btn btn-primary mr-5px"
+                              >
+                                <i className="fa-solid fa-rotate-right"></i>
+                              </button>
+                            </div>
                           </Popover>
                         }
                         rootClose
@@ -234,7 +243,7 @@ function WorkList(props) {
                           <span
                             style={{
                               color: 'white',
-                              fontSize: '12px',
+                              fontSize: '10px',
                               display: 'block',
                               padding: '2px 5px',
                               wordBreak: 'break-word'
@@ -248,35 +257,55 @@ function WorkList(props) {
                   )
                 } else {
                   return (
-                    <div
-                      className="w-100 h-100 px-3 d-flex align-items-center"
-                      onClick={() => {
-                        window.top.rowEventHandlers &&
-                          window.top.rowEventHandlers({
-                            rowData,
-                            rowItems: rowData.Dates[i],
-                            onRefresh
-                          })
-                      }}
-                    >
-                      <div
-                        className="w-100 h-40px"
-                        style={{
-                          backgroundColor: '#f64e60',
-                          cursor: 'pointer'
-                        }}
+                    <div className="w-100 h-100 px-3 d-flex align-items-center">
+                      <OverlayTrigger
+                        trigger="click"
+                        placement="top"
+                        overlay={
+                          <Popover
+                            id="popover-basic"
+                            style={{ minWidth: '250px', width: '250px' }}
+                          >
+                            <div className="py-8px px-12px">
+                              <button
+                                type="button"
+                                className="btn btn-primary mr-5px"
+                                onClick={event => {
+                                  window.top.rowEventHandlers &&
+                                    window.top.rowEventHandlers({
+                                      rowData,
+                                      rowItems: rowData.Dates[i],
+                                      onRefresh,
+                                      event
+                                    })
+                                }}
+                              >
+                                <i className="fa-solid fa-rotate-right"></i>
+                              </button>
+                            </div>
+                          </Popover>
+                        }
+                        rootClose
                       >
-                        <span
+                        <div
+                          className="w-100 h-40px"
                           style={{
-                            color: 'white',
-                            fontSize: '12px',
-                            display: 'block',
-                            padding: '2px 5px'
+                            backgroundColor: '#f64e60',
+                            cursor: 'pointer'
                           }}
                         >
-                          {rowData.Dates[i]?.Text}
-                        </span>
-                      </div>
+                          <span
+                            style={{
+                              color: 'white',
+                              fontSize: '12px',
+                              display: 'block',
+                              padding: '2px 5px'
+                            }}
+                          >
+                            {rowData.Dates[i]?.Text}
+                          </span>
+                        </div>
+                      </OverlayTrigger>
                     </div>
                   )
                 }
