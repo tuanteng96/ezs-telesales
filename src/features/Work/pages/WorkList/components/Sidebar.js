@@ -4,7 +4,7 @@ import { Formik, Form } from 'formik'
 import DatePicker, { registerLocale } from 'react-datepicker'
 import clsx from 'clsx'
 import { useSelector } from 'react-redux'
-
+import Select from 'react-select'
 import vi from 'date-fns/locale/vi' // the locale you w
 import { WorkContext } from 'src/features/Work'
 
@@ -90,6 +90,47 @@ function Sidebar({ filters, onSubmit, loading, onRefresh }) {
                         dateFormatCalendar="MMMM"
                       />
                     </div>
+                  </div>
+                  <div className="form-group mb-15px">
+                    <label className="font-label text-muted mb-5px">
+                      Tình trạng
+                    </label>
+                    <Select
+                      isLoading={loading}
+                      className="select-control"
+                      classNamePrefix="select"
+                      placeholder="Chọn"
+                      menuPosition="fixed"
+                      name="filter.status"
+                      onChange={otp => {
+                        setFieldValue('filter.status', otp?.value || '', false)
+                      }}
+                      value={
+                        values.filter.status !== ''
+                          ? [
+                              {
+                                label: 'Tất cả',
+                                value: 0
+                              },
+                              {
+                                label: 'Không có dữ liệu',
+                                value: 1
+                              }
+                            ].filter(x => x.value === values.filter.status)
+                          : null
+                      }
+                      isClearable={true}
+                      options={[
+                        {
+                          label: 'Tất cả',
+                          value: 0
+                        },
+                        {
+                          label: 'Không có dữ liệu',
+                          value: 1
+                        }
+                      ]}
+                    />
                   </div>
                 </div>
                 <div className="border-top p-15px d-flex">

@@ -51,7 +51,8 @@ function WorkList(props) {
       : {
           filter: {
             from: moment().startOf('month').toDate(),
-            to: moment().endOf('month').toDate()
+            to: moment().endOf('month').toDate(),
+            status: 1
           },
           pi: 1,
           ps: 20
@@ -95,7 +96,7 @@ function WorkList(props) {
             Pcount: data?.pcount || 0,
             Total: data?.total || 0
           }
-          if (filters.pi > 1) {
+          if (filters.pi > 1 || !callback) {
             setLists(prevState => [
               ...prevState,
               ...List.map(x => ({ ...x, ID: x.Member.ID }))
@@ -164,6 +165,7 @@ function WorkList(props) {
                     onClick={event => {
                       window.top.rowEventHandlers &&
                         window.top.rowEventHandlers({
+                          event,
                           rowData,
                           rowItems: rowData.Dates[i],
                           onRefresh
@@ -319,8 +321,25 @@ function WorkList(props) {
                 ? 'bg-light-waring p-0'
                 : 'p-0',
             headerClassName: ({ column }) =>
-              column.title === moment().format('DD-MM-YYYY') &&
-              'bg-light-waring'
+              column.title === moment().format('DD-MM-YYYY')
+                ? 'px-0 bg-light-waring'
+                : 'px-0',
+            headerRenderer: () => (
+              <div
+                className="w-100 h-100 d-flex justify-content-center align-items-center current-pointer"
+                onClick={event => {
+                  window.top.rowEventHandlers &&
+                    window.top.rowHeaderHandlers({
+                      CrDate: value.Date,
+                      data: Lists || [],
+                      event,
+                      onRefresh
+                    })
+                }}
+              >
+                {moment(value.Date).format('DD-MM-YYYY')}
+              </div>
+            )
           }
           newColumns.push(clm)
         }
@@ -391,7 +410,7 @@ function WorkList(props) {
             </span>
           </div>
           <div className="w-85px w-md-auto d-flex">
-            <button
+            {/* <button
               type="button"
               className="btn btn-primary mr-5px"
               onClick={() =>
@@ -399,7 +418,7 @@ function WorkList(props) {
               }
             >
               <i className="fa-solid fa-rotate-right"></i>
-            </button>
+            </button> */}
             <Navbar ExportExcel={ExportExcel} IsLoadingEx={IsLoadingEx} />
             <button
               type="button"
